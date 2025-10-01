@@ -1,6 +1,12 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import * as nodemailer from 'nodemailer';
 
+// Helper function to send JSON response
+const sendJsonResponse = (res: VercelResponse, status: number, data: any) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.status(status).json(data);
+};
+
 type RequestBody = {
   name: string;
   email: string;
@@ -9,6 +15,7 @@ type RequestBody = {
 
 // Enable CORS
 const allowCors = (fn: Function) => async (req: VercelRequest, res: VercelResponse) => {
+  // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -17,51 +24,80 @@ const allowCors = (fn: Function) => async (req: VercelRequest, res: VercelRespon
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
   );
   
+  // Handle preflight
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
   }
   
-  return await fn(req, res);
+  try {
+    // Ensure we always return JSON
+    res.setHeader('Content-Type', 'application/json');
+    return await fn(req, res);
+  } catch (error) {
+    console.error('API Error:', error);
+    return sendJsonResponse(res, 500, { 
+      success: false, 
+      message: 'Internal server error' 
+    });
+  }
 };
 
 const handler = async (req: VercelRequest, res: VercelResponse) => {
   if (req.method !== 'POST') {
-    return res.status(405).json({ success: false, message: 'Method not allowed' });
+    return sendJsonResponse(res, 405, { success: false, message: 'Method not allowed' });
   }
 
-  const { name, email, message } = req.body as RequestBody;
+  // Parse JSON body
+  let body: RequestBody;
+  try {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  } catch (e) {
+    return sendJsonResponse(res, 400, { success: false, message: 'Invalid JSON body' });
+  }
+
+  const { name, email, message } = body;
 
   // Validate input
-  if (!name || !email) {
-    return res.status(400).json({ success: false, message: 'Name and email are required' });
+  if (!name?.trim() || !email?.trim()) {
+    return sendJsonResponse(res, 400, { 
+      success: false, 
+      message: 'Name and email are required' 
+    });
   }
 
   try {
-    if (!process.env.VITE_EMAIL_USER || !process.env.VITE_EMAIL_PASS) {
-      throw new Error('Email configuration is missing');
+    // Validate email configuration
+    const emailUser = process.env.VITE_EMAIL_USER;
+    const emailPass = process.env.VITE_EMAIL_PASS;
+    
+    if (!emailUser || !emailPass) {
+      console.error('Email configuration is missing');
+      throw new Error('Server configuration error');
     }
 
+    // Create transporter
     const transporter = nodemailer.createTransport({
       host: process.env.VITE_EMAIL_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.VITE_EMAIL_PORT || '587'),
       secure: process.env.VITE_EMAIL_SECURE === 'true',
-      auth: {
-        user: process.env.VITE_EMAIL_USER,
-        pass: process.env.VITE_EMAIL_PASS,
-      },
+      auth: { user: emailUser, pass: emailPass },
     });
 
-    const mailOptions = {
-      from: `"${name}" <${process.env.VITE_EMAIL_USER}>`,
-      to: process.env.VITE_EMAIL_RECIPIENT || process.env.VITE_EMAIL_USER,
+    // Send email
+    const recipient = process.env.VITE_EMAIL_RECIPIENT || emailUser;
+    const emailText = [
+      `Name: ${name}`,
+      `Email: ${email}`,
+      `Message: ${message || 'No message provided'}`
+    ].join('\n\n');
+
+    await transporter.sendMail({
+      from: `"${name}" <${emailUser}>`,
+      to: recipient,
       replyTo: email,
       subject: `New Contact Form Submission from ${name}`,
-      text: [
-        `Name: ${name}`,
-        `Email: ${email}`,
-        `Message: ${message || 'No message provided'}`
-      ].join('\n'),
+      text: emailText,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <h2>New Contact Form Submission</h2>
@@ -73,19 +109,17 @@ const handler = async (req: VercelRequest, res: VercelResponse) => {
           </div>
         </div>
       `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
     
-    return res.status(200).json({ 
+    return sendJsonResponse(res, 200, { 
       success: true, 
       message: 'Message sent successfully' 
     });
   } catch (error: any) {
     console.error('Error sending email:', error);
-    return res.status(500).json({ 
+    return sendJsonResponse(res, 500, { 
       success: false, 
-      message: error.message || 'Failed to send message. Please try again later.' 
+      message: 'Failed to send message. Please try again later.' 
     });
   }
 };

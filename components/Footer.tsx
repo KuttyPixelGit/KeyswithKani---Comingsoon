@@ -55,10 +55,10 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      // Log the API URL for debugging
-      console.log('Sending request to:', `${API_BASE_URL}/api/contact`);
+      const apiUrl = `${API_BASE_URL}/api/contact`;
+      console.log('Sending request to:', apiUrl);
       
-      const response = await fetch(`${API_BASE_URL}/api/contact`, {
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,6 +71,7 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
         }),
       });
 
+      // Always try to parse as JSON first
       let data;
       try {
         data = await response.json();
@@ -81,7 +82,11 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
       
       if (!response.ok) {
         console.error('API Error:', data);
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        throw new Error(data.message || `Error: ${response.status}`);
+      }
+
+      if (!data.success) {
+        throw new Error(data.message || 'Request failed');
       }
 
       // Clear form and show success message
