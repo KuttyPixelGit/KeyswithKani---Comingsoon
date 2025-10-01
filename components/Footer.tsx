@@ -55,7 +55,8 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      const apiUrl = `${API_BASE_URL}/api/contact`;
+      // Use relative path for API endpoint - Vercel will handle the routing
+      const apiUrl = '/api/contact';
       console.log('Sending request to:', apiUrl);
       
       const response = await fetch(apiUrl, {
