@@ -7,6 +7,11 @@ import PhoneIcon from './icons/PhoneIcon';
 import LocationIcon from './icons/LocationIcon';
 import SendIcon from './icons/SendIcon';
 
+// Extend the ImportMeta interface to include Vite's env properties
+interface ImportMetaEnv {
+  VITE_API_BASE_URL?: string;
+}
+
 // --- Contact Form Component ---
 const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
@@ -19,25 +24,45 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) return;
+    if (!formData.name || !formData.email) {
+      setStatus('error');
+      return;
+    }
+    
     setStatus('submitting');
+
     try {
-      const response = await fetch("https://formsubmit.co/ajax/contact@keyswithkani.ca", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({ 
-          ...formData, 
-          _subject: `New Contact Form - ${formData.name}`,
-          _autoresponse: "Thank you for contacting Keyswithkani! We've received your message and will get back to you as soon as possible."
-        })
+      // Use environment variable if available, otherwise use relative path
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+      const response = await fetch(`${baseUrl}/api/send-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          message: formData.message || 'No message provided',
+        }),
       });
-      if (!response.ok) throw new Error('Network response was not ok');
+
+      if (!response.ok) {
+        const data = await response.json();
+        console.error('Server error:', data);
+        throw new Error(data.message || 'Failed to send message');
+      }
+
       const data = await response.json();
       if (data.success) {
-        setStatus('submitted');
-        setFormData({ name: "", email: "", message: "" });
+        console.log('Email sent successfully:', data);
+        if (data.previewUrl) {
+          console.log('Preview URL:', data.previewUrl);
+        }
+        setStatus('success');
+        setFormData({ name: '', email: '', message: '' });
       } else {
-        setStatus('error');
+        console.error('Server error:', data);
+        throw new Error(data.message || 'Failed to send message');
       }
     } catch (error) {
       console.error("Form submission error:", error);
