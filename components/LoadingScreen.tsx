@@ -106,9 +106,9 @@ const LoadingScreen: React.FC = () => {
                 </h2>
                 <div className="mt-4 h-1 w-24 bg-gradient-to-r from-[#FFD700] to-[#00C8C8] mx-auto rounded-full" />
               </div>
-              <style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
-              `}</style>
+              <style dangerouslySetInnerHTML={{
+                __html: `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');`
+              }} />
             </div>
           </div>
         </div>

@@ -15,7 +15,20 @@ interface ImportMetaEnv {
 // --- Contact Form Component ---
 const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'submitted' | 'error'>('idle');
+  
+  // Define the form state type
+  type FormState = 
+    | { status: 'idle' }
+    | { status: 'submitting' }
+    | { status: 'submitted' }
+    | { status: 'error'; error?: string };
+    
+  const [formState, setFormState] = useState<FormState>({ status: 'idle' });
+  
+  // Helper function to update form state
+  const updateFormState = (newState: FormState) => {
+    setFormState(newState);
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -24,54 +37,103 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.name || !formData.email) {
-      setStatus('error');
+    
+    // Basic validation
+    if (!formData.name?.trim() || !formData.email?.trim()) {
+      updateFormState({ status: 'error', error: 'Name and email are required' });
       return;
     }
     
-    setStatus('submitting');
+    updateFormState({ status: 'submitting' });
 
     try {
-      // Use environment variable if available, otherwise use relative path
-      const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-      const response = await fetch(`${baseUrl}/api/send-email`, {
+      const apiUrl = '/api/send-email';  // This will be proxied by Vite
+      const requestBody = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        message: formData.message?.trim() || 'No message provided',
+      };
+      
+      console.log('Sending request to:', apiUrl, 'with data:', requestBody);
+
+      console.log('Sending request to:', apiUrl);
+      console.log('Request body:', requestBody);
+
+      const response = await fetch(apiUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name,
-          email: formData.email,
-          message: formData.message || 'No message provided',
-        }),
+        body: JSON.stringify(requestBody),
+        credentials: 'include', // Include cookies if needed
       });
 
+      console.log('Response status:', response.status, response.statusText);
+      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
+      
+      let data;
+      const responseText = await response.text();
+      console.log('Raw response text:', responseText);
+      
+      try {
+        data = responseText ? JSON.parse(responseText) : {};
+        console.log('Parsed response data:', data);
+      } catch (parseError) {
+        console.error('Error parsing JSON response:', parseError);
+        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
+      }
+      
       if (!response.ok) {
-        const data = await response.json();
-        console.error('Server error:', data);
-        throw new Error(data.message || 'Failed to send message');
+        const errorMessage = data?.message || `Server responded with status ${response.status}`;
+        console.error('API Error:', {
+          status: response.status,
+          statusText: response.statusText,
+          url: response.url,
+          error: errorMessage,
+          response: data
+        });
+        throw new Error(errorMessage);
       }
-
-      const data = await response.json();
-      if (data.success) {
-        console.log('Email sent successfully:', data);
-        if (data.previewUrl) {
-          console.log('Preview URL:', data.previewUrl);
-        }
-        setStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        console.error('Server error:', data);
-        throw new Error(data.message || 'Failed to send message');
+      
+      console.log('Email sent successfully:', data);
+      
+      console.log('Email sent successfully:', data);
+      if (data.previewUrl) {
+        console.log('Preview URL:', data.previewUrl);
       }
+      
+      // Clear form and show success message
+      setFormData({ name: '', email: '', message: '' });
+      updateFormState({ status: 'submitted' });
+      
+      // Reset to idle state after 5 seconds
+      setTimeout(() => {
+        updateFormState({ status: 'idle' });
+      }, 5000);
+      
     } catch (error) {
       console.error("Form submission error:", error);
-      setStatus('error');
+      updateFormState({ 
+        status: 'error', 
+        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+      });
+      
+      // Auto-reset to idle state after 5 seconds
+      setTimeout(() => {
+        updateFormState({ status: 'idle' });
+      }, 5000);
     }
   };
 
   const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 focus:outline-none focus:scale-105 ${isDarkMode ? "bg-black/20 border-[#00C8C8]/30 text-white placeholder-gray-400 focus:border-[#00C8C8] focus:bg-black/40" : "bg-white/60 border-[#00C8C8]/40 text-black placeholder-gray-500 focus:border-[#00C8C8] focus:bg-white/80"}`;
   const boxShadowStyle = { boxShadow: isDarkMode ? "0 0 20px rgba(0, 200, 200, 0.1)" : "0 0 20px rgba(0, 200, 200, 0.2)" };
+
+  // Determine if the form is in a loading state
+  const isLoading = formState.status === 'submitting';
+  const isSubmitted = formState.status === 'submitted';
+  const isError = formState.status === 'error';
+  const isIdle = formState.status === 'idle';
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-16">
@@ -118,15 +180,119 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
           }}>
             Ready to create something amazing together?
           </p>
-          <style jsx global>{`
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-          `}</style>
+          <style dangerouslySetInnerHTML={{
+            __html: `
+              @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+              
+              @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+              }
+              
+              @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+              }
+              
+              @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+              }
+              
+              @keyframes pulseGlowGoldTeal {
+                0%, 100% { 
+                  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 30px rgba(0, 200, 200, 0.2);
+                }
+                50% { 
+                  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), 0 0 40px rgba(0, 200, 200, 0.4);
+                }
+              }
+            `
+          }} />
         </div>
-        {status === 'submitted' ? (
-          <div className={`text-center p-6 rounded-2xl backdrop-blur-md border-2 ${isDarkMode ? "bg-green-900/20 border-green-400/30 text-green-300" : "bg-green-50/80 border-green-500/40 text-green-700"}`} style={{ animation: "successPulse 2s ease-in-out infinite" }}>
-            <div className="text-4xl mb-3">✨</div>
-            <h3 className="text-xl font-bold mb-2">Message Sent!</h3>
-            <p className="text-base">Thank you for reaching out. We'll get back to you soon!</p>
+        
+        {isSubmitted ? (
+          <div 
+            className={`p-6 rounded-2xl backdrop-blur-md border-2 ${
+              isDarkMode 
+                ? "bg-green-900/30 border-green-400/40 text-green-200" 
+                : "bg-green-50/90 border-green-500/50 text-green-800"
+            }`}
+            style={{
+              animation: "fadeIn 0.3s ease-out",
+              boxShadow: isDarkMode 
+                ? "0 4px 20px rgba(0, 200, 200, 0.2)" 
+                : "0 4px 20px rgba(0, 200, 200, 0.1)"
+            }}
+          >
+            <div className="flex flex-col items-center">
+              <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
+                <svg 
+                  className="w-8 h-8 text-green-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M5 13l4 4L19 7" 
+                  />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold mb-2">Message Sent Successfully!</h3>
+              <p className="text-center max-w-md">
+                Thank you for reaching out. We've received your message and will get back to you as soon as possible.
+              </p>
+            </div>
+          </div>
+        ) : isError ? (
+          <div 
+            className={`p-6 rounded-2xl backdrop-blur-md border-2 ${
+              isDarkMode 
+                ? "bg-red-900/20 border-red-400/30 text-red-200" 
+                : "bg-red-50/90 border-red-500/50 text-red-800"
+            }`}
+            style={{
+              animation: "shake 0.5s ease-in-out",
+              boxShadow: isDarkMode 
+                ? "0 4px 20px rgba(255, 0, 0, 0.1)" 
+                : "0 4px 20px rgba(255, 0, 0, 0.05)"
+            }}
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mr-3">
+                <svg 
+                  className="w-6 h-6 text-red-400" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" 
+                  />
+                </svg>
+              </div>
+              <div>
+                <h3 className="text-lg font-bold mb-1">
+                  {formState.error || 'Oops! Something went wrong'}
+                </h3>
+                <p className="text-sm">
+                  We couldn't send your message. Please try again in a few moments or contact us directly at 
+                  <a 
+                    href="mailto:contact@keyswithkani.com" 
+                    className="underline hover:opacity-80 transition-opacity"
+                  >
+                    contact@keyswithkani.com
+                  </a>.
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -163,11 +329,54 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
               style={{...boxShadowStyle, fontFamily: '"Playfair Display", serif'}} 
             />
             <div className="text-center">
-              <button type="submit" disabled={status === 'submitting'} className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 mx-auto ${isDarkMode ? "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700]" : "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700]"}`} style={{ boxShadow: `0 8px 20px ${isDarkMode ? "rgba(0, 200, 200, 0.4)" : "rgba(0, 200, 200, 0.5)"}`, animation: status === 'submitting' ? "spin 1s linear infinite" : "pulseGlowGoldTeal 2s infinite" }}>
-                {status === 'submitting' ? "Sending..." : <><SendIcon /> Send Message</>}
+              <button 
+                type="submit" 
+                disabled={isLoading || isSubmitted} 
+                className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto ${
+                  isDarkMode 
+                    ? "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700] disabled:opacity-80" 
+                    : "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700] disabled:opacity-80"
+                }`} 
+                style={{ 
+                  minWidth: '180px',
+                  boxShadow: isDarkMode 
+                    ? "0 8px 20px rgba(0, 200, 200, 0.4)" 
+                    : "0 8px 20px rgba(0, 200, 200, 0.5)",
+                  animation: isLoading 
+                    ? "spin 1s linear infinite" 
+                    : isSubmitted 
+                      ? 'none' 
+                      : "pulseGlowGoldTeal 2s infinite"
+                }}
+              >
+                {isLoading ? (
+                  <>
+                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Sending...
+                  </>
+                ) : isSubmitted ? (
+                  <>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Message Sent!
+                  </>
+                ) : (
+                  <>
+                    <SendIcon />
+                    Send Message
+                  </>
+                )}
               </button>
             </div>
-            {status === 'error' && <p className="mt-3 text-red-500 text-sm">Submission failed. Please try again.</p>}
+            {status === 'error' && (
+              <p className="mt-3 text-red-500 text-sm">
+                Submission failed. Please try again.
+              </p>
+            )}
           </form>
         )}
       </div>
@@ -277,9 +486,9 @@ const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode })
             }}>
               Meet Kani
             </h2>
-            <style jsx global>{`
-              @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');
-            `}</style>
+            <style dangerouslySetInnerHTML={{
+              __html: `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');`
+            }} />
             <p className={`text-lg md:text-xl mb-8 leading-relaxed ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
              ✨ I'm Kanimozhi Sundaram, a Realtor in Ontario who turns real estate into more than just a transaction - it's about dreams, trust, and new beginnings. My goal is simple: to make your buying or selling journey smooth, successful, and unforgettable. Let's find the place where your story truly begins. ✨
             </p>

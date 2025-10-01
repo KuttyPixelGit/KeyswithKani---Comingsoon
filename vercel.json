@@ -4,7 +4,9 @@
     {
       "src": "package.json",
       "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
+      "config": {
+        "distDir": "dist"
+      }
     },
     {
       "src": "api/**/*.js",
@@ -17,9 +19,8 @@
       "dest": "/api/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/$1",
-      "headers": { "cache-control": "s-maxage=3600" }
+      "src": "^/(.*)",
+      "dest": "/dist/$1"
     }
   ]
 }
