@@ -9,6 +9,8 @@ export default defineConfig(({ mode }) => {
         assetsDir: 'assets',
         emptyOutDir: true,
         rollupOptions: {
+          // Exclude server-side code from client build
+          external: ['nodemailer', 'fs', 'path', 'os', 'child_process'],
           output: {
             assetFileNames: 'assets/[name]-[hash][extname]',
             chunkFileNames: 'assets/[name]-[hash].js',
