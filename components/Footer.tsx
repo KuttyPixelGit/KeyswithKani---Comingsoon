@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import InstagramIcon from './icons/InstagramIcon';
 import LinkedinIcon from './icons/LinkedinIcon';
 import FacebookIcon from './icons/FacebookIcon';
@@ -10,7 +11,14 @@ import SendIcon from './icons/SendIcon';
 // Extend the ImportMeta interface to include Vite's env properties
 interface ImportMetaEnv {
   VITE_API_BASE_URL?: string;
+  VITE_EMAIL_USER?: string;
+  VITE_EMAIL_PASS?: string;
+  VITE_EMAIL_RECIPIENT?: string;
 }
+
+// Ensure environment variables are available
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
+const EMAIL_RECIPIENT = import.meta.env.VITE_EMAIL_RECIPIENT || 'contact@keyswithkani.ca';
 
 // --- Contact Form Component ---
 const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
@@ -47,10 +55,14 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      const response = await fetch('/api/contact', {
+      // Log the API URL for debugging
+      console.log('Sending request to:', `${API_BASE_URL}/api/contact`);
+      
+      const response = await fetch(`${API_BASE_URL}/api/contact`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
         body: JSON.stringify({
           name: formData.name.trim(),
@@ -59,23 +71,19 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
         }),
       });
 
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (jsonError) {
+        console.error('Failed to parse JSON response:', jsonError);
+        throw new Error('Received invalid response from the server');
+      }
       
       if (!response.ok) {
-        throw new Error(data.message || 'Failed to send message');
+        console.error('API Error:', data);
+        throw new Error(data.message || `HTTP error! status: ${response.status}`);
       }
 
-      // Clear form on success
-      setFormData({ name: '', email: '', message: '' });
-      updateFormState({ status: 'submitted' });
-      
-      console.log('Email sent successfully:', data);
-      
-      console.log('Email sent successfully:', data);
-      if (data.previewUrl) {
-        console.log('Preview URL:', data.previewUrl);
-      }
-      
       // Clear form and show success message
       setFormData({ name: '', email: '', message: '' });
       updateFormState({ status: 'submitted' });
