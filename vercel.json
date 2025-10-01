@@ -3,8 +3,8 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/node",
-      "config": { "includeFiles": ["dist/**"] }
+      "use": "@vercel/static-build",
+      "config": { "distDir": "dist" }
     },
     {
       "src": "api/**/*.js",
@@ -18,7 +18,8 @@
     },
     {
       "src": "/(.*)",
-      "dest": "/dist/$1"
+      "dest": "/$1",
+      "headers": { "cache-control": "s-maxage=3600" }
     }
   ]
 }
