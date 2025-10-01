@@ -15,8 +15,8 @@
   ],
   "routes": [
     {
-      "src": "/api/send-email",
-      "dest": "/api/send-email"
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
     },
     {
       "src": "^/(.*)",

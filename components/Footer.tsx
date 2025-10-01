@@ -47,54 +47,27 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      const apiUrl = `${import.meta.env.VITE_API_BASE_URL || '/api'}/send-email`;
-      const requestBody = {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        message: formData.message?.trim() || 'No message provided',
-      };
-      
-      console.log('Sending request to:', apiUrl, 'with data:', requestBody);
-
-      console.log('Sending request to:', apiUrl);
-      console.log('Request body:', requestBody);
-
-      const response = await fetch(apiUrl, {
+      const response = await fetch('/api/contact', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Accept': 'application/json',
         },
-        body: JSON.stringify(requestBody),
-        credentials: 'include', // Include cookies if needed
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          message: formData.message?.trim() || 'No message provided',
+        }),
       });
 
-      console.log('Response status:', response.status, response.statusText);
-      console.log('Response headers:', Object.fromEntries(response.headers.entries()));
-      
-      let data;
-      const responseText = await response.text();
-      console.log('Raw response text:', responseText);
-      
-      try {
-        data = responseText ? JSON.parse(responseText) : {};
-        console.log('Parsed response data:', data);
-      } catch (parseError) {
-        console.error('Error parsing JSON response:', parseError);
-        throw new Error(`Invalid JSON response: ${responseText.substring(0, 100)}...`);
-      }
+      const data = await response.json();
       
       if (!response.ok) {
-        const errorMessage = data?.message || `Server responded with status ${response.status}`;
-        console.error('API Error:', {
-          status: response.status,
-          statusText: response.statusText,
-          url: response.url,
-          error: errorMessage,
-          response: data
-        });
-        throw new Error(errorMessage);
+        throw new Error(data.message || 'Failed to send message');
       }
+
+      // Clear form on success
+      setFormData({ name: '', email: '', message: '' });
+      updateFormState({ status: 'submitted' });
       
       console.log('Email sent successfully:', data);
       

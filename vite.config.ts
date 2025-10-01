@@ -1,44 +1,43 @@
 import { defineConfig, loadEnv } from 'vite';
-import { fileURLToPath } from 'url';
-import path from 'path';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+import { apiPlugin } from './src/plugins/api';
 
 export default defineConfig(({ mode }) => {
+  // Load environment variables for both Vite and Node.js
   const env = loadEnv(mode, process.cwd(), '');
+  
+  // Make environment variables available to the Node.js server
+  process.env = { ...process.env, ...env };
   
   return {
     publicDir: 'public',
+    plugins: [
+      // @ts-ignore - Vite plugin type issue
+      apiPlugin(),
+    ],
     server: {
       port: 5173,
       strictPort: true,
       host: true,
       cors: {
-        origin: 'http://localhost:5173',
+        origin: [
+          'https://www.keyswithkani.ca',
+          'https://keyswithkani.vercel.app',
+          'http://localhost:5173'
+        ],
         methods: ['GET', 'POST', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization'],
         credentials: true
-      },
-      proxy: {
-        '/api': {
-          target: 'http://localhost:3000',
-          changeOrigin: true,
-          secure: false,
-          // Remove the rewrite to keep the /api prefix
-          configure: (proxy) => {
-            proxy.on('error', (err) => {
-              console.error('Proxy error:', err);
-            });
-            proxy.on('proxyReq', (proxyReq, req) => {
-              console.log('Proxying request to:', req.method, req.url);
-              proxyReq.setHeader('x-forwarded-host', 'localhost:5173');
-            });
-          },
-        },
-      },
+      }
     },
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src'),
-        '~': path.resolve(__dirname, '.')
+        '@': resolve(__dirname, 'src'),
+        '~': resolve(__dirname, '.')
       }
     },
     build: {
