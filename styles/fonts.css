@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'Balgin Display';
+  src: url('../Fonts Style/BalginDisplay medium.otf') format('opentype');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+.balgin-display {
+  font-family: 'Balgin Display', sans-serif;
+  font-weight: 500;
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/Icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/Icon.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/Icon.png">
+    <link rel="shortcut icon" href="/Icon.png">
+    <link rel="apple-touch-icon" href="/Icon.png">
+    <meta name="theme-color" content="#000000">
+    <!-- Preload critical resources -->
+    <link rel="preload" href="/Icon.png" as="image">
+    <link rel="preload" href="/keyswithKani.gif" as="image">
+    <link rel="preload" href="/Kani.png" as="image">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keyswithkani - Coming Soon</title>
+    <!-- Load local fonts -->
+    <link rel="stylesheet" href="/fonts.css">
+    <!-- Optimize Tailwind CSS delivery -->
+    <script src="https://cdn.tailwindcss.com"></script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.544.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <!-- Optimize script loading -->
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
