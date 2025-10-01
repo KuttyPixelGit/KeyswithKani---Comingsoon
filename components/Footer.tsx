@@ -47,7 +47,7 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      const apiUrl = '/api/send-email';  // This will be proxied by Vite
+      const apiUrl = `${import.meta.env.VITE_API_BASE_URL || '/api'}/send-email`;
       const requestBody = {
         name: formData.name.trim(),
         email: formData.email.trim(),
