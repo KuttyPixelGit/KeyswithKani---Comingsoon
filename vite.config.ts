@@ -1,31 +1,29 @@
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
-import { apiPlugin } from './vite-plugin-api';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 export default defineConfig(({ mode }) => {
-  // Load env file so it's available to the plugin
+  // Load env vars so Vite can inject them into import.meta.env
   const env = loadEnv(mode, process.cwd(), '');
   process.env = { ...process.env, ...env };
-  
+
   const isProduction = mode === 'production';
-  
+
   return {
-    // Configure esbuild for React
     esbuild: {
       jsx: 'automatic',
       jsxImportSource: 'react'
     },
     base: '/',
     publicDir: 'public',
-    plugins: [apiPlugin()],
+    plugins: [], // ⬅️ Removed apiPlugin()
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      sourcemap: false, // Disable sourcemaps in production
+      sourcemap: false,
       minify: isProduction ? 'esbuild' : false,
       emptyOutDir: true,
       target: 'esnext',
@@ -37,7 +35,7 @@ export default defineConfig(({ mode }) => {
       },
       rollupOptions: {
         input: {
-          main: './index.html',
+          main: './index.html'
         },
         output: {
           manualChunks: {
@@ -48,15 +46,16 @@ export default defineConfig(({ mode }) => {
           chunkFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash][extname]'
         },
-        external: ['nodemailer', 'fs', 'path', 'os', 'child_process']
-      },
+        // ⬅️ You don’t need nodemailer etc. in client build anymore
+        external: []
+      }
     },
     server: {
       port: 5173,
       strictPort: true,
       host: true,
       cors: {
-        origin: isProduction 
+        origin: isProduction
           ? [
               'https://www.keyswithkani.ca',
               'https://keyswithkani.vercel.app'
