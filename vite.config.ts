@@ -14,11 +14,11 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   
   return {
-    // Ensure React is properly handled
+    // Configure esbuild for React
     esbuild: {
       jsxFactory: 'React.createElement',
       jsxFragment: 'React.Fragment',
-      jsxInject: `import React from 'react'`
+      // Don't inject React import here as it's already imported in the files
     },
     base: './',
     publicDir: 'public',
