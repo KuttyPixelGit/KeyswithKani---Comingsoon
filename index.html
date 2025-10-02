@@ -18,18 +18,13 @@
     <link rel="stylesheet" href="/fonts.css">
     <!-- Optimize Tailwind CSS delivery -->
     <script src="https://cdn.tailwindcss.com"></script>
-  <script type="importmap">
-{
-  "imports": {
-    "react": "https://aistudiocdn.com/react@^19.1.1",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
-    "react/": "https://aistudiocdn.com/react@^19.1.1/",
-    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.544.0"
-</script>
+  <!-- Production React -->
+  <script type="module" src="https://esm.sh/react@18.2.0"></script>
+  <script type="module" src="https://esm.sh/react-dom@18.2.0/client"></script>
 </head>
   <body>
     <div id="root">Loading...</div>
-    <script type="module" src="/src/main.tsx"></script>
+    <script type="module" src="/index.tsx"></script>
     <script>
       // Error handling for failed script loading
       window.addEventListener('error', function(e) {

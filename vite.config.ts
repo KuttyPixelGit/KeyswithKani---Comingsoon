@@ -17,6 +17,27 @@ export default defineConfig(({ mode }) => {
     base: './',
     publicDir: 'public',
     plugins: [apiPlugin()],
+    build: {
+      outDir: 'dist',
+      assetsDir: 'assets',
+      sourcemap: !isProduction,
+      minify: isProduction ? 'esbuild' : false,
+      emptyOutDir: true,
+      target: 'esnext',
+      modulePreload: true,
+      cssCodeSplit: true,
+      rollupOptions: {
+        input: {
+          main: './index.html',
+        },
+        output: {
+          entryFileNames: 'assets/[name]-[hash].js',
+          chunkFileNames: 'assets/[name]-[hash].js',
+          assetFileNames: 'assets/[name]-[hash][extname]'
+        },
+        external: ['nodemailer', 'fs', 'path', 'os', 'child_process']
+      }
+    },
     server: {
       port: 5173,
       strictPort: true,
@@ -40,24 +61,6 @@ export default defineConfig(({ mode }) => {
       alias: {
         '@': resolve(__dirname, 'src'),
         '~': resolve(__dirname, '.')
-      }
-    },
-    build: {
-      outDir: 'dist',
-      assetsDir: 'assets',
-      sourcemap: !isProduction,
-      minify: isProduction ? 'esbuild' : false,
-      emptyOutDir: true,
-      target: 'esnext',
-      modulePreload: true,
-      cssCodeSplit: true,
-      rollupOptions: {
-        external: ['nodemailer', 'fs', 'path', 'os', 'child_process'],
-        output: {
-          assetFileNames: 'assets/[name]-[hash][extname]',
-          chunkFileNames: 'assets/[name]-[hash].js',
-          entryFileNames: 'assets/[name]-[hash].js'
-        }
       }
     },
     define: {
