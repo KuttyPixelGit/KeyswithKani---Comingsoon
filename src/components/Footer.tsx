@@ -8,17 +8,8 @@ import PhoneIcon from './icons/PhoneIcon';
 import LocationIcon from './icons/LocationIcon';
 import SendIcon from './icons/SendIcon';
 
-// Extend the ImportMeta interface to include Vite's env properties
-interface ImportMetaEnv {
-  VITE_API_BASE_URL?: string;
-  VITE_EMAIL_USER?: string;
-  VITE_EMAIL_PASS?: string;
-  VITE_EMAIL_RECIPIENT?: string;
-}
-
-// Ensure environment variables are available
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
-const EMAIL_RECIPIENT = import.meta.env.VITE_EMAIL_RECIPIENT || 'contact@keyswithkani.ca';
+// FormSubmit endpoint for the contact form
+const FORM_SUBMIT_URL = 'https://formsubmit.co/ajax/contact@keyswithkani.ca';
 
 // --- Contact Form Component ---
 const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
@@ -55,17 +46,7 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      // Use the same domain as the frontend to avoid CORS issues
-      const apiUrl = '/api/contact';
-      
-      console.log('Sending form data:', {
-        name: formData.name.trim(),
-        email: formData.email.trim(),
-        message: formData.message?.trim() || 'No message provided',
-      });
-      console.log('Sending request to:', apiUrl);
-      
-      const response = await fetch(apiUrl, {
+      const response = await fetch(FORM_SUBMIT_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,35 +56,17 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
           name: formData.name.trim(),
           email: formData.email.trim(),
           message: formData.message?.trim() || 'No message provided',
+          _subject: `New Contact Form Submission from ${formData.name.trim()}`,
+          _template: 'table',
+          _captcha: 'false', // Disable captcha for now, you can enable it later
+          _next: window.location.href, // Redirect to the same page after submission
         }),
       });
 
-      // Always try to parse as JSON first
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.error('Failed to parse JSON response:', jsonError);
-        throw new Error('Received invalid response from the server');
-      }
+      const data = await response.json();
       
       if (!response.ok) {
-        console.error('API Error Response:', {
-          status: response.status,
-          statusText: response.statusText,
-          data
-        });
-        
-        // Handle specific HTTP errors
-        if (response.status === 500) {
-          throw new Error('Server error. Please try again later.');
-        } else if (response.status === 400) {
-          throw new Error(data.message || 'Invalid form data. Please check your inputs.');
-        } else if (response.status === 404) {
-          throw new Error('API endpoint not found. Please contact support.');
-        } else {
-          throw new Error(data.message || `Error: ${response.status} - ${response.statusText}`);
-        }
+        throw new Error(data.message || 'Failed to send message. Please try again later.');
       }
 
       // Clear form and show success message
@@ -119,7 +82,7 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
       console.error("Form submission error:", error);
       updateFormState({ 
         status: 'error', 
-        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+        error: error instanceof Error ? error.message : 'Failed to send message. Please try again later.'
       });
       
       // Auto-reset to idle state after 5 seconds
