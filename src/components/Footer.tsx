@@ -55,11 +55,8 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      // Use the correct API endpoint path for both development and production
-      const baseUrl = import.meta.env.PROD 
-        ? 'https://keyswithkani.vercel.app' 
-        : '';
-      const apiUrl = `${baseUrl}/api/contact`;
+      // Use the same domain as the frontend to avoid CORS issues
+      const apiUrl = '/api/contact';
       
       console.log('Sending form data:', {
         name: formData.name.trim(),
