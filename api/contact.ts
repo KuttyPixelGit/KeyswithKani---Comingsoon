@@ -1,22 +1,22 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import nodemailer from 'nodemailer';
 
-// Helper function to set CORS headers
-function setCorsHeaders(res: VercelResponse) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-}
+export const config = {
+  api: {
+    bodyParser: true,
+    externalResolver: true,
+  },
+};
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Handle OPTIONS request first
   if (req.method === 'OPTIONS') {
-    setCorsHeaders(res);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     return res.status(200).end();
   }
-
-  // Set CORS headers for actual requests
-  setCorsHeaders(res);
 
   // Only allow POST requests
   if (req.method !== 'POST') {
