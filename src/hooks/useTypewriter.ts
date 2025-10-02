@@ -1,64 +1,63 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+
 export function useTypewriter(text: string, start: boolean) {
   const [displayText, setDisplayText] = useState("");
-  const [dots, setDots] = useState("");
   const [showBlinkingDot, setShowBlinkingDot] = useState(false);
   const [typingComplete, setTypingComplete] = useState(false);
-
+  
+  // Use refs to store interval IDs
+  const dotIntervalRef = useRef<number | undefined>(undefined);
+  const typeTimerRef = useRef<number | undefined>(undefined);
+  
   useEffect(() => {
     if (!start) return;
 
     // Clear any existing state
     setDisplayText("");
-    setDots("");
     setShowBlinkingDot(false);
     setTypingComplete(false);
 
     const baseText = text.endsWith('...') ? text.slice(0, -3) : text;
     let index = 0;
-    let dotCount = 0;
-    let dotInterval: NodeJS.Timeout;
 
-    const typeTimer = setInterval(() => {
+    // Clear any existing intervals
+    if (dotIntervalRef.current) window.clearInterval(dotIntervalRef.current);
+    if (typeTimerRef.current) window.clearInterval(typeTimerRef.current);
+
+    typeTimerRef.current = window.setInterval(() => {
       if (index < baseText.length) {
         setDisplayText(baseText.slice(0, index + 1));
         index++;
       } else {
-        clearInterval(typeTimer);
+        if (typeTimerRef.current) {
+          window.clearInterval(typeTimerRef.current);
+        }
+        
         setTypingComplete(true);
-
-        const typeDots = () => {
-          if (dotCount < 2) {
-            setDots('.'.repeat(dotCount + 1));
-            dotCount++;
-            setTimeout(typeDots, 200); // Delay between dots
-          } else if (dotCount === 2) {
-            // Add the third dot and start blinking
-            setDots('..'); // Show only two dots initially
-            // Start blinking the third dot after a short delay
-            setTimeout(() => {
-              let show = true;
-              setShowBlinkingDot(show);
-              dotInterval = setInterval(() => {
-                show = !show;
-                setShowBlinkingDot(show);
-              }, 500);
-            }, 200);
-            dotCount++;
-          }
-        };
-        typeDots();
+        
+        // Start blinking the dot
+        let show = true;
+        setShowBlinkingDot(show);
+        
+        if (dotIntervalRef.current) {
+          window.clearInterval(dotIntervalRef.current);
+        }
+        
+        dotIntervalRef.current = window.setInterval(() => {
+          show = !show;
+          setShowBlinkingDot(show);
+        }, 500);
       }
-    }, 45); // Typing speed
+    }, 45);
 
     return () => {
-      if (dotInterval) clearInterval(dotInterval);
+      if (dotIntervalRef.current) window.clearInterval(dotIntervalRef.current);
+      if (typeTimerRef.current) window.clearInterval(typeTimerRef.current);
     };
   }, [start, text]);
 
   return { 
     displayText,
-    dots,
     showBlinkingDot,
     typingComplete
   };

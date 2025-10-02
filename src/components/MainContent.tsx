@@ -15,8 +15,8 @@ interface HeroSectionProps {
 }
 
 const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) => {
-  const fullHeadline = "Get Ready to Open the Door";
-  const { displayText, dots, showBlinkingDot, typingComplete } = useTypewriter(
+  const fullHeadline = "Get Ready to Open the Door...";
+  const { displayText, showBlinkingDot, typingComplete } = useTypewriter(
     fullHeadline,
     showContent
   );
@@ -61,15 +61,35 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
     return () => clearInterval(timer);
   }, []);
 
-  // Inline styles for the component
+  // Handle touch events for mobile devices
+  const handleTouchMove = (e: React.TouchEvent<HTMLElement>) => {
+    if (!e.touches[0]) return;
+    const touch = e.touches[0];
+    const rect = e.currentTarget.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (touch.clientX - cx) / rect.width;
+    const dy = (touch.clientY - cy) / rect.height;
+    setTilt({ x: dx * 5, y: dy * 5 }); // Reduced tilt effect for touch devices
+  };
+
+  const handleTouchEnd = () => {
+    setTilt({ x: 0, y: 0 });
+  };
+
+  // Responsive styles with proper TypeScript types
   const styles = {
     section: {
-      minHeight: '100vh',
-      display: 'flex',
+      minHeight: '100dvh' as const,
+      display: 'flex' as const,
       flexDirection: 'column' as const,
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '2rem 1rem',
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
+      padding: '1rem',
+      paddingTop: 'max(1rem, env(safe-area-inset-top, 1rem))' as any,
+      paddingBottom: 'max(1rem, env(safe-area-inset-bottom, 1rem))' as any,
+      paddingLeft: 'max(1rem, env(safe-area-inset-left, 1rem))' as any,
+      paddingRight: 'max(1rem, env(safe-area-inset-right, 1rem))' as any,
       position: 'relative' as const,
       overflow: 'hidden' as const,
     },
@@ -79,6 +99,9 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
       lineHeight: '1.2',
       letterSpacing: '0.05em',
       textShadow: isDarkMode ? '0 0 15px rgba(0, 200, 200, 0.3)' : '0 0 5px rgba(0, 0, 0, 0.1)',
+      transition: 'transform 0.1s ease-out',
+      willChange: 'transform' as const,
+      backfaceVisibility: 'hidden' as const,
     },
   };
 
@@ -87,17 +110,26 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
       style={styles.section}
       onMouseMove={handleMove}
       onMouseLeave={handleLeave}
-      className="relative z-10 text-center px-4"
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+      className="relative z-10 text-center px-4 w-full"
     >
-      <div className="max-w-4xl mx-auto">
-        <div className="mb-8 flex justify-center">
+      <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-4 sm:mb-6 md:mb-8 flex justify-center">
           <div className="relative">
-            <div className="absolute -right-10 -top-8 w-1 h-1 rounded-full" style={{ 
-              background: 'radial-gradient(circle, #ffffff 0%, #FFD700 30%, #00C8C8 60%, rgba(0,200,200,0) 70%)', 
-              boxShadow: '0 0 12px rgba(255,215,0,0.95), 0 0 20px rgba(0,200,200,0.55)',
-              animation: showContent ? 'starTravelHero .5s ease-out .3s forwards, sparklePulse .6s ease-in-out .3s infinite alternate' : 'none',
-              filter: 'drop-shadow(0 0 6px rgba(255,215,0,0.85))',
-              pointerEvents: 'none'
+            <div 
+              className="absolute -right-8 sm:-right-10 -top-6 sm:-top-8 w-1 h-1 rounded-full" 
+              style={{ 
+                background: 'radial-gradient(circle, #ffffff 0%, #FFD700 30%, #00C8C8 60%, rgba(0,200,200,0) 70%)', 
+                boxShadow: '0 0 12px rgba(255,215,0,0.95), 0 0 20px rgba(0,200,200,0.55)',
+                animation: showContent ? 'starTravelHero .5s ease-out .3s forwards, sparklePulse .6s ease-in-out .3s infinite alternate' : 'none',
+                filter: 'drop-shadow(0 0 6px rgba(255,215,0,0.85))',
+                pointerEvents: 'none',
+                // Optimize for performance
+                willChange: 'transform, opacity' as const,
+                transform: 'translateZ(0)' as const,
+                backfaceVisibility: 'hidden' as const,
+                perspective: '1000px' as const
             }}></div>
             <div className="relative w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 mx-auto">
               <img 
@@ -134,38 +166,59 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
           }}
         >
           {displayText}
-          <span className="relative" style={{ 
-            background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginLeft: '0.1em',
-            letterSpacing: '0.2em',
-            marginRight: '-0.15em',
-            position: 'relative',
-            display: 'inline-block'
-          }}>
-            {dots}
-            {typingComplete && (
-              <span className="absolute right-0 top-0" style={{
-                opacity: showBlinkingDot ? 1 : 0.4,
-                transition: 'opacity 0.5s ease-in-out',
-                transform: 'translateX(100%)',
-                marginLeft: '0.05em'
-              }}>.</span>
-            )}
-          </span>
+          {typingComplete && (
+            <span className="relative" style={{ 
+              display: 'inline-flex',
+              alignItems: 'center',
+              marginLeft: '0.1em',
+              letterSpacing: '0.2em'
+            }}>
+              <span style={{
+                background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                position: 'relative',
+                display: 'inline-block',
+                width: '1.5em',
+                textAlign: 'left'
+              }}>
+                <span style={{ 
+                  opacity: 1,
+                  letterSpacing: '0.1em',
+                  display: 'inline-block',
+                  width: '1.2em',
+                  textAlign: 'center'
+                }}>
+                  <span style={{ marginRight: '0.1em' }}>.</span>
+                  <span style={{ marginRight: '0.1em' }}>.</span>
+                </span>
+                <span style={{
+                  position: 'absolute',
+                  right: 0,
+                  top: 0,
+                  opacity: showBlinkingDot ? 1 : 0,
+                  transition: 'opacity 0.5s ease-in-out',
+                  background: 'inherit',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  letterSpacing: '0.1em',
+                  width: '0.4em',
+                  textAlign: 'center'
+                }}>.</span>
+              </span>
+            </span>
+          )}
         </h1>
-        
         {/* Subheading */}
         <div 
           className={`text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto leading-relaxed mt-8 ${
             isDarkMode ? "text-gray-200" : "text-gray-800"
-          }`}
+          } ${showBlinkingDot ? 'animate-float' : ''}`}
           style={{ 
             fontFamily: '"Playfair Display", serif',
             fontWeight: 400,
             textShadow: isDarkMode ? "0 2px 8px rgba(0,0,0,0.6)" : "none",
-            animation: "textFloat 4s ease-in-out infinite"
+            animation: showBlinkingDot ? 'blink 1s step-end infinite' : 'none'
           }}
         >
           <p>

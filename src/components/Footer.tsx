@@ -101,118 +101,118 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
   const isError = formState.status === 'error';
   const isIdle = formState.status === 'idle';
 
+
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-lg">
+        <style dangerouslySetInnerHTML={{
+          __html: `
+            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+            
+            @keyframes successPulse {
+              0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 15px rgba(0, 200, 200, 0.4), 0 0 30px rgba(0, 200, 200, 0.2);
+              }
+              50% { 
+                transform: scale(1.01);
+                box-shadow: 0 0 25px rgba(0, 200, 200, 0.6), 0 0 40px rgba(0, 200, 200, 0.4);
+              }
+            }
+            
+            @keyframes fadeIn {
+              from { opacity: 0; transform: translateY(10px); }
+              to { opacity: 1; transform: translateY(0); }
+            }
+            
+            @keyframes shake {
+              0%, 100% { transform: translateX(0); }
+              10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+              20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+            
+            @keyframes pulseGlowGoldTeal {
+              0%, 100% { 
+                box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 30px rgba(0, 200, 200, 0.2);
+              }
+              50% { 
+                box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), 0 0 40px rgba(0, 200, 200, 0.4);
+              }
+            }
+          `
+        }} />
         <div className="text-center mb-8">
-          <h2 className="text-3xl md:text-4xl mb-4 tracking-tight" style={{ 
-            fontFamily: '"Poppins", sans-serif',
-            fontWeight: 700,
-            letterSpacing: '-0.02em',
-            color: isDarkMode ? '#fff' : '#111827',
-            position: 'relative',
-            display: 'inline-block'
-          }}>
-            <span style={{
-              background: 'linear-gradient(90deg, #00C8C8 0%, #FFD700 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+          <div>
+            <h2 className="text-3xl md:text-4xl mb-4 tracking-tight" style={{ 
+              fontFamily: '"Poppins", sans-serif',
+              fontWeight: 700,
+              letterSpacing: '-0.02em',
+              color: isDarkMode ? '#fff' : '#111827',
               position: 'relative',
-              zIndex: 1
+              display: 'inline-block'
             }}>
-              Get In Touch
-            </span>
-            <span style={{
-              content: '""',
-              position: 'absolute',
-              bottom: '-4px',
-              left: 0,
-              width: '100%',
-              height: '3px',
-              background: 'linear-gradient(90deg, #00C8C8 0%, #FFD700 100%)',
-              borderRadius: '2px',
-              transform: 'scaleX(0.8)'
-            }} />
-          </h2>
-          <p className={`text-base md:text-lg ${isDarkMode ? "text-gray-300" : "text-gray-600"}`} style={{ 
-            fontFamily: '"Poppins", sans-serif',
-            fontWeight: 400,
-            letterSpacing: '0.01em',
-            marginTop: '0.75rem',
-            maxWidth: '28rem',
-            marginLeft: 'auto',
-            marginRight: 'auto',
-            lineHeight: '1.6'
-          }}>
-            Ready to create something amazing together?
-          </p>
-          <style dangerouslySetInnerHTML={{
-            __html: `
-              @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
-              
-              @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
-              }
-              
-              @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-              }
-              
-              @keyframes spin {
-                from { transform: rotate(0deg); }
-                to { transform: rotate(360deg); }
-              }
-              
-              @keyframes pulseGlowGoldTeal {
-                0%, 100% { 
-                  box-shadow: 0 0 15px rgba(255, 215, 0, 0.4), 0 0 30px rgba(0, 200, 200, 0.2);
-                }
-                50% { 
-                  box-shadow: 0 0 25px rgba(255, 215, 0, 0.6), 0 0 40px rgba(0, 200, 200, 0.4);
-                }
-              }
-            `
-          }} />
+                <span style={{
+                  background: 'linear-gradient(90deg, #00C8C8 0%, #FFD700 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  Get In Touch
+                </span>
+                <span style={{
+                  content: '""',
+                  position: 'absolute',
+                  bottom: '-4px',
+                  left: 0,
+                  width: '100%',
+                  height: '3px',
+                  background: 'linear-gradient(90deg, #00C8C8 0%, #FFD700 100%)',
+                  borderRadius: '2px',
+                  transform: 'scaleX(0.8)'
+                }} />
+              </h2>
+              <p 
+                className="text-base md:text-lg" 
+                style={{
+                  fontFamily: '"Poppins", sans-serif',
+                  fontWeight: 400,
+                  letterSpacing: '0.01em',
+                  marginTop: '0.75rem',
+                  maxWidth: '28rem',
+                  marginLeft: 'auto',
+                  marginRight: 'auto',
+                  lineHeight: '1.6',
+                  color: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)'
+                }}
+              >
+                Ready to create something amazing together?
+              </p>
+            </div>
         </div>
         
         {isSubmitted ? (
           <div 
-            className={`p-6 rounded-2xl backdrop-blur-md border-2 ${
+            className={`text-center p-8 rounded-3xl backdrop-blur-md border-2 ${
               isDarkMode 
-                ? "bg-green-900/30 border-green-400/40 text-green-200" 
-                : "bg-green-50/90 border-green-500/50 text-green-800"
+                ? "bg-green-900/20 border-green-400/30 text-green-300" 
+                : "bg-green-50/80 border-green-500/40 text-green-700"
             }`}
-            style={{
-              animation: "fadeIn 0.3s ease-out",
+            style={{ 
+              animation: "successPulse 2s ease-in-out infinite",
               boxShadow: isDarkMode 
-                ? "0 4px 20px rgba(0, 200, 200, 0.2)" 
-                : "0 4px 20px rgba(0, 200, 200, 0.1)"
+                ? "0 0 20px rgba(0, 200, 200, 0.3)" 
+                : "0 0 20px rgba(0, 200, 200, 0.2)"
             }}
           >
-            <div className="flex flex-col items-center">
-              <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mb-4">
-                <svg 
-                  className="w-8 h-8 text-green-400" 
-                  fill="none" 
-                  stroke="currentColor" 
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                    strokeLinecap="round" 
-                    strokeLinejoin="round" 
-                    strokeWidth={2} 
-                    d="M5 13l4 4L19 7" 
-                  />
-                </svg>
-              </div>
-              <h3 className="text-xl font-bold mb-2">Message Sent Successfully!</h3>
-              <p className="text-center max-w-md text-sm">
-                Thank you for contacting us. We'll get back to you as soon as possible.
-              </p>
-            </div>
+            <div className="text-6xl mb-4">✨</div>
+            <h3 className="text-2xl font-bold mb-2">Message Sent!</h3>
+            <p className="text-lg">Thank you for reaching out. We'll get back to you soon!</p>
           </div>
         ) : isError ? (
           <div 
@@ -305,48 +305,43 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
               style={{...boxShadowStyle, fontFamily: '"Playfair Display", serif'}} 
             />
             <div className="text-center">
-              <button 
-                type="submit" 
-                disabled={isLoading || isSubmitted} 
-                className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto ${
-                  isDarkMode 
-                    ? "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700] disabled:opacity-80" 
-                    : "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700] disabled:opacity-80"
-                }`} 
-                style={{ 
-                  minWidth: '180px',
-                  boxShadow: isDarkMode 
-                    ? "0 8px 20px rgba(0, 200, 200, 0.4)" 
-                    : "0 8px 20px rgba(0, 200, 200, 0.5)",
-                  animation: isLoading 
-                    ? "spin 1s linear infinite" 
-                    : isSubmitted 
+                <button 
+                  type="submit" 
+                  disabled={isLoading || isSubmitted} 
+                  className={`px-6 py-2.5 rounded-full font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 flex items-center justify-center gap-2 mx-auto ${
+                    isDarkMode 
+                      ? "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700] disabled:opacity-80" 
+                      : "bg-gradient-to-r from-[#FFD700] to-[#00C8C8] text-black hover:from-[#00C8C8] hover:to-[#FFD700] disabled:opacity-80"
+                  }`} 
+                  style={{ 
+                    minWidth: '180px',
+                    boxShadow: isDarkMode 
+                      ? "0 8px 20px rgba(0, 200, 200, 0.4)" 
+                      : "0 8px 20px rgba(0, 200, 200, 0.5)",
+                    animation: isSubmitted 
                       ? 'none' 
                       : "pulseGlowGoldTeal 2s infinite"
-                }}
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Sending...
-                  </>
-                ) : isSubmitted ? (
-                  <>
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Message Sent!
-                  </>
-                ) : (
-                  <>
-                    <SendIcon />
-                    Send Message
-                  </>
-                )}
-              </button>
+                  }}
+                >
+                  {isLoading ? (
+                    <>
+                      <span className="animate-pulse">•</span>
+                      Sending...
+                    </>
+                  ) : isSubmitted ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Message Sent!
+                    </>
+                  ) : (
+                    <>
+                      <SendIcon />
+                      Send Message
+                    </>
+                  )}
+                </button>
             </div>
             {status === 'error' && (
               <p className="mt-3 text-red-500 text-sm">

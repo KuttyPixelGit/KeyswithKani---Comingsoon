@@ -1,14 +1,103 @@
 import React from 'react';
 
 const GlobalStyles: React.FC<{ isDarkMode: boolean }> = () => {
-  // The isDarkMode prop is not directly used here because theme-specific styles
-  // are handled via the `html.dark` class selector, which is toggled in `useComingSoon.ts`.
-  // This approach aligns with Tailwind CSS's dark mode strategy.
   return (
     <style>{`
+      /* Base responsive styles */
+      :root {
+        --safe-area-inset-top: env(safe-area-inset-top, 0px);
+        --safe-area-inset-right: env(safe-area-inset-right, 0px);
+        --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+        --safe-area-inset-left: env(safe-area-inset-left, 0px);
+      }
+
+      /* Reset and base styles */
+      *, *::before, *::after {
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-text-size-adjust: 100%;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      html {
+        height: 100%;
+        overflow-x: hidden;
+        touch-action: manipulation;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+      }
+
       body {
-        /* Smooth scrolling for anchor links */
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        min-height: 100dvh;
+        overscroll-behavior-y: none;
+        -webkit-overflow-scrolling: touch;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         scroll-behavior: smooth;
+        position: relative;
+        overflow-x: hidden;
+        padding: 0;
+        margin: 0;
+        width: 100%;
+      }
+
+      /* Responsive typography */
+      html {
+        font-size: 16px;
+      }
+
+      @media (max-width: 768px) {
+        html {
+          font-size: 15px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        html {
+          font-size: 14px;
+        }
+      }
+
+      /* Prevent horizontal scroll */
+      img, svg, video, canvas, iframe {
+        max-width: 100%;
+        height: auto;
+      }
+
+      /* Better touch targets */
+      button, [role="button"], input[type="submit"], input[type="button"] {
+        min-height: 44px;
+        min-width: 44px;
+      }
+
+      /* Smooth scrolling for iOS */
+      @supports (-webkit-touch-callout: none) {
+        body {
+          height: -webkit-fill-available;
+        }
+      }
+
+      /* Animation performance */
+      .animate-optimize {
+        will-change: transform, opacity;
+        transform: translateZ(0);
+        backface-visibility: hidden;
+        perspective: 1000px;
+      }
+      
+      /* Blinking cursor animation */
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+      }
+      
+      @keyframes textFloat {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
       }
       
       @keyframes zoomFlip {
