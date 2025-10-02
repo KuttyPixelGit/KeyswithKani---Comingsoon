@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   
   return {
+    base: './',
     publicDir: 'public',
     plugins: [apiPlugin()],
     server: {
@@ -47,6 +48,9 @@ export default defineConfig(({ mode }) => {
       sourcemap: !isProduction,
       minify: isProduction ? 'esbuild' : false,
       emptyOutDir: true,
+      target: 'esnext',
+      modulePreload: true,
+      cssCodeSplit: true,
       rollupOptions: {
         external: ['nodemailer', 'fs', 'path', 'os', 'child_process'],
         output: {
