@@ -19,23 +19,31 @@
     <!-- Optimize Tailwind CSS delivery -->
     <script src="https://cdn.tailwindcss.com"></script>
   <!-- Production React -->
-  <script type="module" src="https://esm.sh/react@18.2.0"></script>
-  <script type="module" src="https://esm.sh/react-dom@18.2.0/client"></script>
+  <script src="https://unpkg.com/react@18.2.0/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18.2.0/umd/react-dom.production.min.js"></script>
+  <script>
+    // Ensure React is available globally
+    window.React = React;
+    window.ReactDOM = ReactDOM;
+  </script>
 </head>
   <body>
     <div id="root">Loading...</div>
     <script type="module" src="/index.tsx"></script>
     <script>
-      // Error handling for failed script loading
+      // Fallback error handling
       window.addEventListener('error', function(e) {
         console.error('Script loading error:', e);
-        document.getElementById('root').innerHTML = `
-          <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
-            <h1>Something went wrong</h1>
-            <p>Please refresh the page or try again later.</p>
-            <p style="color: #666; margin-top: 2rem;">Error: ${e.message}</p>
-          </div>
-        `;
+        const root = document.getElementById('root');
+        if (root) {
+          root.innerHTML = `
+            <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
+              <h1>Something went wrong</h1>
+              <p>Please refresh the page or try again later.</p>
+              <p style="color: #666; margin-top: 2rem;">Error: ${e.message}</p>
+            </div>
+          `;
+        }
       });
     </script>
   </body>

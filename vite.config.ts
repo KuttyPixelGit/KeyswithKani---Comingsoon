@@ -14,6 +14,12 @@ export default defineConfig(({ mode }) => {
   const isProduction = mode === 'production';
   
   return {
+    // Ensure React is properly handled
+    esbuild: {
+      jsxFactory: 'React.createElement',
+      jsxFragment: 'React.Fragment',
+      jsxInject: `import React from 'react'`
+    },
     base: './',
     publicDir: 'public',
     plugins: [apiPlugin()],
@@ -26,6 +32,9 @@ export default defineConfig(({ mode }) => {
       target: 'esnext',
       modulePreload: true,
       cssCodeSplit: true,
+      commonjsOptions: {
+        transformMixedEsModules: true
+      },
       rollupOptions: {
         input: {
           main: './index.html',
