@@ -1,36 +1,37 @@
 import { defineConfig, loadEnv } from 'vite';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { apiPlugin } from './vite-plugin-api';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-import { apiPlugin } from './src/plugins/api';
 
 export default defineConfig(({ mode }) => {
-  // Load environment variables for both Vite and Node.js
+  // Load env file so it's available to the plugin
   const env = loadEnv(mode, process.cwd(), '');
-  
-  // Make environment variables available to the Node.js server
   process.env = { ...process.env, ...env };
+  
+  const isProduction = mode === 'production';
   
   return {
     publicDir: 'public',
-    plugins: [
-      // @ts-ignore - Vite plugin type issue
-      apiPlugin(),
-    ],
+    plugins: [apiPlugin()],
     server: {
       port: 5173,
       strictPort: true,
       host: true,
       cors: {
-        origin: [
-          'https://www.keyswithkani.ca',
-          'https://keyswithkani.vercel.app',
-          'http://localhost:5173'
-        ],
-        methods: ['GET', 'POST', 'OPTIONS'],
-        allowedHeaders: ['Content-Type', 'Authorization'],
+        origin: isProduction 
+          ? [
+              'https://www.keyswithkani.ca',
+              'https://keyswithkani.vercel.app'
+            ]
+          : [
+              'http://localhost:5173',
+              'http://localhost:3000'
+            ],
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['X-Requested-With', 'Content-Type', 'Authorization'],
         credentials: true
       }
     },
@@ -41,29 +42,24 @@ export default defineConfig(({ mode }) => {
       }
     },
     build: {
+      outDir: 'dist',
       assetsDir: 'assets',
+      sourcemap: !isProduction,
+      minify: isProduction ? 'terser' : false,
       emptyOutDir: true,
-      sourcemap: mode === 'development',
       rollupOptions: {
         external: ['nodemailer', 'fs', 'path', 'os', 'child_process'],
         output: {
           assetFileNames: 'assets/[name]-[hash][extname]',
           chunkFileNames: 'assets/[name]-[hash].js',
-          entryFileNames: 'assets/[name]-[hash].js',
-        },
-      },
-      minify: 'terser',
-      terserOptions: {
-        compress: {
-          drop_console: true,
-          drop_debugger: true,
-        },
-      },
-      cssCodeSplit: true,
+          entryFileNames: 'assets/[name]-[hash].js'
+        }
+      }
     },
     define: {
-      'process.env.API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || '')
+      'process.env.NODE_ENV': JSON.stringify(mode),
+      'import.meta.env.PROD': isProduction,
+      'import.meta.env.DEV': !isProduction
     },
     optimizeDeps: {
       include: ['react', 'react-dom', '@vercel/analytics', 'lucide-react']

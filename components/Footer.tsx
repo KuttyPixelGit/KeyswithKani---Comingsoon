@@ -433,7 +433,7 @@ const ContactInfo = ({ isDarkMode }: { isDarkMode: boolean }) => (
           <div className="flex gap-4 mb-4">
             <SocialLink href="https://instagram.com/keyswithkani" icon={InstagramIcon} isDarkMode={isDarkMode} />
             <SocialLink href="https://www.linkedin.com/company/keyswithkani" icon={LinkedinIcon} isDarkMode={isDarkMode} />
-            <SocialLink href="http://facebook.com/keyswithkani" icon={FacebookIcon} isDarkMode={isDarkMode} />
+            <SocialLink href="https://www.facebook.com/profile.php?id=61581206012026" icon={FacebookIcon} isDarkMode={isDarkMode} />
           </div>
         </ContactCard>
       </div>

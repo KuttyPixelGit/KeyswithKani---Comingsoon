@@ -1,6 +1,12 @@
-import React, { useEffect, useMemo, useRef, useState, memo } from "react";
+import React, { useEffect, useMemo, useState, memo } from "react";
 
-const Particles = memo(({ color = "#00C8C8", count = 80, intensity = 1 }) => {
+interface ParticlesProps {
+  color?: string;
+  count?: number;
+  intensity?: number;
+}
+
+const Particles = memo(({ color = "#00C8C8", count = 80, intensity = 1 }: ParticlesProps) => {
   const dots = useMemo(() => Array.from({ length: count }).map((_, i) => i), [count]);
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
@@ -34,15 +40,19 @@ const Particles = memo(({ color = "#00C8C8", count = 80, intensity = 1 }) => {
             opacity: Math.max(0.05, (Math.random() * 0.4 + 0.1) * intensity),
             animation: `particleFloat ${2 + Math.random() * 4}s ease-in-out infinite`,
             animationDelay: `${Math.random() * 3}s`,
-            transform: `translate(${mouse.x * 3}px, ${mouse.y * 3}px)`, // Reduce mouse effect for better performance
+            transform: `translate(${mouse.x * 3}px, ${mouse.y * 3}px)`,
           }}
-        />)
-      )}
+        />
+      ))}
     </div>
   );
 });
 
-const EffectsBackground: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
+interface EffectsBackgroundProps {
+  isDarkMode: boolean;
+}
+
+const EffectsBackground = ({ isDarkMode }: EffectsBackgroundProps) => {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
 
   useEffect(() => {

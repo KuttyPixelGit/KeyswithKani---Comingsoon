@@ -1,3 +1,8 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
 # Logs
 logs
 *.log
@@ -5,16 +10,10 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+lerna-debug.log*
 
 # Editor directories and files
-vscode/*
+.vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
@@ -25,6 +24,7 @@ vscode/*
 *.sw?
 
 # Test files
+test-*.ts
 test-*.js
 
 # Node modules
@@ -34,10 +34,8 @@ node_modules/
 /dist
 /.vercel
 
-# Server files
-server.js
-
 # Misc
 next
 coverage
-node_modules
+server/
+*.tsbuildinfo

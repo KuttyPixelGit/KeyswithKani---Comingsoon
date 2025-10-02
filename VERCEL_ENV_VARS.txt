@@ -1,0 +1,45 @@
+============================================
+VERCEL ENVIRONMENT VARIABLES
+============================================
+
+Copy and paste these into Vercel Dashboard:
+Settings → Environment Variables
+
+============================================
+
+SMTP_HOST=smtp.gmail.com
+
+SMTP_PORT=587
+
+SMTP_SECURE=false
+
+SMTP_USER=kuttypixelindia@gmail.com
+
+SMTP_PASS=oelljtmdbstiyfpg
+
+EMAIL_FROM=kuttypixelindia@gmail.com
+
+EMAIL_TO=contact@keyswithkani.ca
+
+============================================
+
+INSTRUCTIONS:
+
+1. Go to: https://vercel.com/your-username/keyswithkani/settings/environment-variables
+
+2. Click "Add New" for each variable above
+
+3. Set "Environment" to: Production, Preview, and Development
+
+4. After adding all variables, redeploy your site
+
+============================================
+
+TEST AFTER DEPLOYMENT:
+
+1. Visit your live site
+2. Fill out the contact form
+3. Check contact@keyswithkani.ca for the email
+4. Verify you receive the message
+
+============================================
