@@ -55,8 +55,13 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     updateFormState({ status: 'submitting' });
 
     try {
-      // Use relative path for API endpoint - Vercel will handle the routing
+      // Use the correct API endpoint path for Vercel
       const apiUrl = '/api/contact';
+      console.log('Sending form data:', {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        message: formData.message?.trim() || 'No message provided',
+      });
       console.log('Sending request to:', apiUrl);
       
       const response = await fetch(apiUrl, {
@@ -82,12 +87,22 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
       }
       
       if (!response.ok) {
-        console.error('API Error:', data);
-        throw new Error(data.message || `Error: ${response.status}`);
-      }
-
-      if (!data.success) {
-        throw new Error(data.message || 'Request failed');
+        console.error('API Error Response:', {
+          status: response.status,
+          statusText: response.statusText,
+          data
+        });
+        
+        // Handle specific HTTP errors
+        if (response.status === 500) {
+          throw new Error('Server error. Please try again later.');
+        } else if (response.status === 400) {
+          throw new Error(data.message || 'Invalid form data. Please check your inputs.');
+        } else if (response.status === 404) {
+          throw new Error('API endpoint not found. Please contact support.');
+        } else {
+          throw new Error(data.message || `Error: ${response.status} - ${response.statusText}`);
+        }
       }
 
       // Clear form and show success message
@@ -230,8 +245,8 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
                 </svg>
               </div>
               <h3 className="text-xl font-bold mb-2">Message Sent Successfully!</h3>
-              <p className="text-center max-w-md">
-                Thank you for reaching out. We've received your message and will get back to you as soon as possible.
+              <p className="text-center max-w-md text-sm">
+                Thank you for contacting us. We'll get back to you as soon as possible.
               </p>
             </div>
           </div>
@@ -267,17 +282,27 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
               </div>
               <div>
                 <h3 className="text-lg font-bold mb-1">
-                  {formState.error || 'Oops! Something went wrong'}
+                  {formState.error?.includes('Server error') ? 'Server Error' : 
+                   formState.error?.includes('Invalid form data') ? 'Validation Error' :
+                   'Oops! Something went wrong'}
                 </h3>
-                <p className="text-sm">
-                  We couldn't send your message. Please try again in a few moments or contact us directly at 
-                  <a 
-                    href="mailto:contact@keyswithkani.com" 
-                    className="underline hover:opacity-80 transition-opacity"
-                  >
-                    contact@keyswithkani.com
-                  </a>.
+                <p className="text-sm mb-3">
+                  {formState.error || 'We encountered an issue sending your message.'}
                 </p>
+                <div className="space-y-2">
+                  <button
+                    onClick={() => updateFormState({ status: 'idle' })}
+                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  >
+                    Try Again
+                  </button>
+                  <a 
+                    href="mailto:contact@keyswithkani.ca" 
+                    className="block w-full text-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors text-sm"
+                  >
+                    Or email us directly
+                  </a>
+                </div>
               </div>
             </div>
           </div>

@@ -42,19 +42,43 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // Create transporter
+    // Validate environment variables
+    if (!process.env.SMTP_USER || !process.env.SMTP_PASSWORD || !process.env.EMAIL_FROM || !process.env.EMAIL_TO) {
+      console.error('Missing required environment variables');
+      return res.status(500).json({
+        success: false,
+        message: 'Server configuration error. Please try again later.',
+      });
+    }
+
+    // Create transporter with better error handling
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: process.env.SMTP_SECURE === 'true',
+      secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        pass: process.env.SMTP_PASSWORD, // Note: Changed from SMTP_PASS to SMTP_PASSWORD
       },
       tls: {
-        rejectUnauthorized: false
-      }
+        // Only disable in development
+        rejectUnauthorized: process.env.NODE_ENV !== 'production'
+      },
+      debug: process.env.NODE_ENV !== 'production', // Enable debug logging in development
+      logger: process.env.NODE_ENV !== 'production' // Log information in development
     });
+
+    // Verify connection configuration
+    try {
+      await transporter.verify();
+      console.log('Server is ready to take our messages');
+    } catch (error) {
+      console.error('SMTP connection error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to connect to email server. Please try again later.',
+      });
+    }
 
     // Send email
     await transporter.sendMail({
