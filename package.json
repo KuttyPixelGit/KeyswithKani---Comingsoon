@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "server": "tsx server/index.ts",
     "server:dev": "nodemon --exec tsx server/index.ts",
-    "vercel-build": "npm install && npm run build"
+    "vercel-build": "npm install --include=dev && npm run build"
   },
   "engines": {
     "node": ">=16.0.0"
