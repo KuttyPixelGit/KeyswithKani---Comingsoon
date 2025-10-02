@@ -1,23 +1,21 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import nodemailer from 'nodemailer';
 
-// Helper function to set CORS headers
-function setCorsHeaders(res: VercelResponse) {
+// Enable CORS
+const allowCors = (handler: Function) => async (req: VercelRequest, res: VercelResponse) => {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, POST');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-}
 
-export default async function handler(req: VercelRequest, res: VercelResponse) {
-  // Handle OPTIONS request first
+  // Handle preflight
   if (req.method === 'OPTIONS') {
-    setCorsHeaders(res);
     return res.status(200).end();
   }
+  return await handler(req, res);
+};
 
-  // Set CORS headers for actual requests
-  setCorsHeaders(res);
-
+const handler = async (req: VercelRequest, res: VercelResponse) => {
   // Only allow POST requests
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -131,17 +129,15 @@ Received at: ${new Date().toLocaleString('en-US', { timeZone: 'America/Toronto' 
       `,
     });
 
-    console.log(`✅ Contact form email sent from ${email}`);
 
     return res.status(200).json({
       success: true,
       message: 'Thank you for contacting us! We will get back to you soon.',
     });
-  } catch (error: any) {
-    console.error('Contact form error:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Failed to send message. Please try again later.',
-    });
+  } catch (error) {
+    console.error('Error sending email:', error);
+    return res.status(500).json({ success: false, message: 'Failed to send message. Please try again later.' });
   }
-}
+};
+
+export default allowCors(handler);
