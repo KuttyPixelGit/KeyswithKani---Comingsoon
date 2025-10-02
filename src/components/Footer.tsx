@@ -21,7 +21,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 const EMAIL_RECIPIENT = import.meta.env.VITE_EMAIL_RECIPIENT || 'contact@keyswithkani.ca';
 
 // --- Contact Form Component ---
-const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
+const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }): React.ReactElement => {
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   
   // Define the form state type
@@ -45,7 +45,6 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
     // Basic validation
     if (!formData.name?.trim() || !formData.email?.trim()) {
       updateFormState({ status: 'error', error: 'Name and email are required' });
@@ -57,11 +56,13 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     try {
       // Use the correct API endpoint path for Vercel
       const apiUrl = '/api/contact';
-      console.log('Sending form data:', {
+      const requestBody = {
         name: formData.name.trim(),
         email: formData.email.trim(),
         message: formData.message?.trim() || 'No message provided',
-      });
+      };
+      
+      console.log('Sending form data:', requestBody);
       console.log('Sending request to:', apiUrl);
       
       const response = await fetch(apiUrl, {
@@ -70,20 +71,25 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
-        body: JSON.stringify({
-          name: formData.name.trim(),
-          email: formData.email.trim(),
-          message: formData.message?.trim() || 'No message provided',
-        }),
+        credentials: 'same-origin',
+        body: JSON.stringify(requestBody),
       });
 
-      // Always try to parse as JSON first
-      let data;
-      try {
-        data = await response.json();
-      } catch (jsonError) {
-        console.error('Failed to parse JSON response:', jsonError);
-        throw new Error('Received invalid response from the server');
+      // Check if the response is JSON
+      const contentType = response.headers.get('content-type');
+      let data: any = {};
+      
+      if (contentType && contentType.includes('application/json')) {
+        try {
+          data = await response.json();
+        } catch (jsonError) {
+          console.error('Failed to parse JSON response:', jsonError);
+          throw new Error('Received invalid response from the server');
+        }
+      } else {
+        const text = await response.text();
+        console.warn('Non-JSON response received:', text);
+        throw new Error('Unexpected response format from server');
       }
       
       if (!response.ok) {
@@ -100,42 +106,42 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
           throw new Error(data.message || 'Invalid form data. Please check your inputs.');
         } else if (response.status === 404) {
           throw new Error('API endpoint not found. Please contact support.');
+        } else if (response.status === 405) {
+          throw new Error('Method not allowed. Please try again or contact support.');
         } else {
           throw new Error(data.message || `Error: ${response.status} - ${response.statusText}`);
         }
       }
 
-      // Clear form and show success message
-      setFormData({ name: '', email: '', message: '' });
+      // If we get here, the request was successful
       updateFormState({ status: 'submitted' });
       
-      // Reset to idle state after 5 seconds
-      setTimeout(() => {
-        updateFormState({ status: 'idle' });
-      }, 5000);
-      
-    } catch (error) {
-      console.error("Form submission error:", error);
-      updateFormState({ 
-        status: 'error', 
-        error: error instanceof Error ? error.message : 'An unknown error occurred' 
-      });
+      // Reset form
+      setFormData({ name: '', email: '', message: '' });
       
       // Auto-reset to idle state after 5 seconds
       setTimeout(() => {
         updateFormState({ status: 'idle' });
       }, 5000);
+      
+    } catch (error) {
+      console.error('Form submission error:', error);
+      updateFormState({ 
+        status: 'error', 
+        error: error instanceof Error ? error.message : 'An unknown error occurred' 
+      });
     }
   };
 
-  const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 focus:outline-none focus:scale-105 ${isDarkMode ? "bg-black/20 border-[#00C8C8]/30 text-white placeholder-gray-400 focus:border-[#00C8C8] focus:bg-black/40" : "bg-white/60 border-[#00C8C8]/40 text-black placeholder-gray-500 focus:border-[#00C8C8] focus:bg-white/80"}`;
-  const boxShadowStyle = { boxShadow: isDarkMode ? "0 0 20px rgba(0, 200, 200, 0.1)" : "0 0 20px rgba(0, 200, 200, 0.2)" };
-
-  // Determine if the form is in a loading state
+  // Define form state variables
   const isLoading = formState.status === 'submitting';
   const isSubmitted = formState.status === 'submitted';
   const isError = formState.status === 'error';
   const isIdle = formState.status === 'idle';
+
+  // Define styles
+  const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 focus:outline-none focus:scale-105 ${isDarkMode ? "bg-black/20 border-[#00C8C8]/30 text-white placeholder-gray-400 focus:border-[#00C8C8] focus:bg-black/40" : "bg-white/60 border-[#00C8C8]/40 text-black placeholder-gray-500 focus:border-[#00C8C8] focus:bg-white/80"}`;
+  const boxShadowStyle = { boxShadow: isDarkMode ? "0 0 20px rgba(0, 200, 200, 0.1)" : "0 0 20px rgba(0, 200, 200, 0.2)" };
 
   return (
     <section className="min-h-screen flex items-center justify-center px-4 py-16">

@@ -39,3 +39,4 @@ next
 coverage
 server/
 *.tsbuildinfo
+.vercel

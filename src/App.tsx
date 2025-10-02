@@ -1,7 +1,7 @@
 import React, { memo, useMemo } from 'react';
 import Header from './components/Header';
 import MainContent from './components/MainContent';
-import Footer from './components/Footer';
+import Footer from './components/NewFooter';
 import EffectsBackground from './components/EffectsBackground';
 import LoadingScreen from './components/LoadingScreen';
 import GlobalStyles from './components/GlobalStyles';
