@@ -5,39 +5,15 @@
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "dist",
-        "outputDirectory": "dist"
+        "distDir": "dist"
       }
     },
     { "src": "api/**/*.ts", "use": "@vercel/node" }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1",
-      "methods": ["GET", "POST", "OPTIONS"],
-      "headers": {
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization"
-      }
-    },
-    { "handle": "filesystem" },
-    { 
-      "src": "/(.*)", 
-      "dest": "/index.html",
-      "status": 200
-    }
-  ],
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
-  },
-  "crons": [
-    {
-      "path": "/api/send-weekly-report",
-      "schedule": "0 9 * * 1"
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
     }
   ]
 }
