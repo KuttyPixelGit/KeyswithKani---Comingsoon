@@ -1,26 +1,65 @@
-import React, { useRef, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useTypewriter } from "../hooks/useTypewriter";
+import "../styles/global.css";
+
+interface CountdownTimeLeft {
+  days: number;
+  hours: number;
+  minutes: number;
+  seconds: number;
+}
 
 interface HeroSectionProps {
-  isDarkMode: boolean;
   showContent: boolean;
+  isDarkMode: boolean;
 }
 
 const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) => {
-  const fullHeadline = "SOMETHING AMAZING IS COMING";
-  const { typewriterText, dots, showBlinkingDot, showDots, typingComplete } = useTypewriter(fullHeadline, showContent);
+  const fullHeadline = "Get Ready to Open the Door";
+  const { displayText, dots, showBlinkingDot, typingComplete } = useTypewriter(
+    fullHeadline,
+    showContent
+  );
   const [tilt, setTilt] = useState({ x: 0, y: 0 });
 
   const handleMove = (e: React.MouseEvent<HTMLElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 3;
+    const cy = rect.top + rect.height / 2;
     const dx = (e.clientX - cx) / rect.width;
     const dy = (e.clientY - cy) / rect.height;
-    setTilt({ x: dx, y: dy });
+    setTilt({ x: dx * 10, y: dy * 10 });
   };
 
   const handleLeave = () => setTilt({ x: 0, y: 0 });
+
+  // Countdown timer state and logic
+  const [timeLeft, setTimeLeft] = useState<CountdownTimeLeft>({
+    days: 0,
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+
+  useEffect(() => {
+    const calculateTimeLeft = () => {
+      const difference = new Date('2026-01-01T00:00:00').getTime() - new Date().getTime();
+      
+      if (difference > 0) {
+        setTimeLeft({
+          days: Math.floor(difference / (1000 * 60 * 60 * 24)),
+          hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
+          minutes: Math.floor((difference / 1000 / 60) % 60),
+          seconds: Math.floor((difference / 1000) % 60),
+        });
+      }
+    };
+
+    const timer = setInterval(calculateTimeLeft, 1000);
+    calculateTimeLeft();
+
+    return () => clearInterval(timer);
+  }, []);
 
   // Inline styles for the component
   const styles = {
@@ -30,180 +69,196 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
       flexDirection: 'column' as const,
       alignItems: 'center',
       justifyContent: 'center',
-      padding: '5rem 1.5rem',
+      padding: '2rem 1rem',
       position: 'relative' as const,
-      overflow: 'hidden'
+      overflow: 'hidden' as const,
     },
     heading: {
-      fontFamily: '"Cabinet Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      fontFamily: '"Playlist Script", cursive',
       transform: `perspective(900px) rotateX(${tilt.y * -1}deg) rotateY(${tilt.x * 2}deg)`,
       lineHeight: '1.2',
-      letterSpacing: '0.02em'
+      letterSpacing: '0.05em',
+      textShadow: isDarkMode ? '0 0 15px rgba(0, 200, 200, 0.3)' : '0 0 5px rgba(0, 0, 0, 0.1)',
     },
-    // Add other styles as needed
   };
 
   return (
-    <section 
+    <section
       style={styles.section}
-      onMouseMove={handleMove} 
+      onMouseMove={handleMove}
       onMouseLeave={handleLeave}
+      className="relative z-10 text-center px-4"
     >
-      <style dangerouslySetInnerHTML={{
-        __html: `
-          @import url('https://api.fontshare.com/v2/css?f[]=general-sans@600,500,400&display=swap');
-          
-          @keyframes subtlePulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.95; }
-          }
-          
-          @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-2px); }
-          }
-          
-          .modern-text {
-            animation: subtlePulse 3s ease-in-out infinite;
-          }
-        `
-      }} />
-      <div className="mb-16" style={{ animation: showContent ? "zoomFlip .7s cubic-bezier(.2,.7,.2,1) both" : "", transformStyle: 'preserve-3d' }}>
-        <div className="relative inline-block">
-          <div className="absolute" style={{ right: '-80px', top: '-50px', width: 5, height: 5, borderRadius: '9999px', background: 'radial-gradient(circle, #ffffff 0%, #FFD700 30%, #00C8C8 60%, rgba(0,200,200,0) 70%)', boxShadow: '0 0 12px rgba(255,215,0,0.95), 0 0 20px rgba(0,200,200,0.55)', transform: 'translate(0,0)', animation: showContent ? 'starTravelHero .5s ease-out .3s forwards, sparklePulse .6s ease-in-out .3s infinite alternate' : 'none', filter: 'drop-shadow(0 0 6px rgba(255,215,0,0.85))', pointerEvents: 'none' }} />
-          <img src="/keyswithKani.gif" alt="Keyswithkani" className="h-24 md:h-36 lg:h-48 w-auto mx-auto" style={{ filter: 'none', borderRadius: 16, transform: `perspective(900px) rotateX(${tilt.y * -6}deg) rotateY(${tilt.x * 8}deg) translateZ(6px)`, animation: `${showContent ? 'heroGlowOn .35s ease-out .65s forwards, logoGlowPulseGoldTeal 4s ease-in-out 1.05s infinite alternate' : 'none'}` }} />
+      <div className="max-w-4xl mx-auto">
+        <div className="mb-8 flex justify-center">
+          <div className="relative">
+            <div className="absolute -right-10 -top-8 w-1 h-1 rounded-full" style={{ 
+              background: 'radial-gradient(circle, #ffffff 0%, #FFD700 30%, #00C8C8 60%, rgba(0,200,200,0) 70%)', 
+              boxShadow: '0 0 12px rgba(255,215,0,0.95), 0 0 20px rgba(0,200,200,0.55)',
+              animation: showContent ? 'starTravelHero .5s ease-out .3s forwards, sparklePulse .6s ease-in-out .3s infinite alternate' : 'none',
+              filter: 'drop-shadow(0 0 6px rgba(255,215,0,0.85))',
+              pointerEvents: 'none'
+            }}></div>
+            <div className="relative w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 mx-auto">
+              <img 
+                src="/keyswithKani.gif" 
+                alt="Keyswithkani" 
+                className="w-full h-full object-contain rounded-2xl"
+                style={{
+                  filter: 'drop-shadow(0 0 10px rgba(0, 200, 200, 0.7))',
+                  animation: showContent ? 
+                    'logoFlip 6s ease-in-out infinite, logoGlowPulseGoldTeal 3s ease-in-out infinite alternate' : 'none',
+                  transformStyle: 'preserve-3d',
+                  willChange: 'transform, filter',
+                  transition: 'all 0.3s ease-out'
+                }}
+              />
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <div className="text-center mb-10 w-full max-w-6xl mx-auto px-4">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl leading-tight text-center whitespace-nowrap overflow-hidden" style={{ 
-          fontFamily: '"Cabinet Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-          fontWeight: 500,
-          color: '#ffffff',
-          transform: `perspective(900px) rotateX(${tilt.y * -1}deg) rotateY(${tilt.x * 2}deg)`, 
-          lineHeight: '1.2',
-          letterSpacing: '0.02em'
-        }}>
-          <div className="relative inline-flex items-center">
-            <span style={{
-              position: 'relative',
-              background: 'linear-gradient(90deg, #00E6E6 0%, #FFEA00 50%, #FFD700 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
-              whiteSpace: 'nowrap',
-              fontWeight: 600,
-              fontStyle: 'italic',
-              transform: 'skewX(-5deg)',
-              letterSpacing: '0.02em',
-              fontSize: '1em',
-              textShadow: isDarkMode ? '0 0 30px rgba(0, 230, 230, 0.4), 0 0 40px rgba(255, 234, 0, 0.3)' : '0 0 10px rgba(0, 0, 0, 0.1)'
-            }}>
-              {typewriterText}
-            </span>
-            {showDots && (
-              <span style={{
-                display: 'inline-flex',
-                alignItems: 'center',
-                fontFamily: '"Cabinet Grotesk", sans-serif',
-                fontSize: '0.9em',
-                fontWeight: '600',
-                fontStyle: 'italic',
-                transform: 'skewX(-5deg)',
-                background: 'linear-gradient(90deg, #00E6E6 0%, #FFEA00 50%, #FFD700 100%)',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textShadow: isDarkMode ? '0 0 15px rgba(0, 230, 230, 0.3)' : '0 0 5px rgba(0, 0, 0, 0.1)',
-                marginLeft: '0.2em',
+        
+        {/* Main headline with blinking dot */}
+        <h1
+          style={{
+            ...styles.heading,
+            fontSize: '3rem',
+            marginTop: '1.5rem',
+            background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            lineHeight: '1.3',
+            letterSpacing: '0.5px',
+            whiteSpace: 'nowrap',
+            fontWeight: 400,
+            textShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
+          }}
+        >
+          {displayText}
+          <span className="relative" style={{ 
+            background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            marginLeft: '0.1em',
+            letterSpacing: '0.2em',
+            marginRight: '-0.15em',
+            position: 'relative',
+            display: 'inline-block'
+          }}>
+            {dots}
+            {typingComplete && (
+              <span className="absolute right-0 top-0" style={{
+                opacity: showBlinkingDot ? 1 : 0.4,
+                transition: 'opacity 0.5s ease-in-out',
+                transform: 'translateX(100%)',
+                marginLeft: '0.05em'
+              }}>.</span>
+            )}
+          </span>
+        </h1>
+        
+        {/* Subheading */}
+        <div 
+          className={`text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto leading-relaxed mt-8 ${
+            isDarkMode ? "text-gray-200" : "text-gray-800"
+          }`}
+          style={{ 
+            fontFamily: '"Playfair Display", serif',
+            fontWeight: 400,
+            textShadow: isDarkMode ? "0 2px 8px rgba(0,0,0,0.6)" : "none",
+            animation: "textFloat 4s ease-in-out infinite"
+          }}
+        >
+          <p>
+            <span>Step into your next chapter with </span>
+            <span style={{ color: isDarkMode ? "#FFC000" : "#00AAAA" }}>confidence</span>
+            <span>, </span>
+            <span style={{ color: isDarkMode ? "#00C8C8" : "#00AAAA" }}>clarity</span>
+            <span>, and </span>
+            <span style={{ color: isDarkMode ? "#FFC000" : "#00AAAA" }}>care</span>
+            <span>.</span>
+          </p>
+          <div 
+            className="mt-2" 
+            style={{
+              color: isDarkMode ? "#FFC000" : "#00AAAA",
+              letterSpacing: '0.05em',
+              fontWeight: 'bold'
+            }}
+          >
+            WITH ME
+          </div>
+        </div>
+        
+        {/* Compact Countdown */}
+        <div className="relative mt-10 mb-12 w-full max-w-md mx-auto px-4">
+          <div className="relative z-10 text-center">
+            <h2 className="text-xl md:text-2xl font-medium mb-1 bg-gradient-to-r from-yellow-300 to-teal-400 bg-clip-text text-transparent">
+              We're Launching In
+            </h2>
+            <p className={`text-xs mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              January 1, 2026
+            </p>
+            
+            {/* Compact countdown box */}
+            <div className={`relative rounded-xl overflow-hidden transition-all duration-300 mx-auto
+              ${isDarkMode ? 'bg-gray-800/90' : 'bg-white/95'}
+              border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
+              shadow-lg hover:shadow-xl animate-glow p-3 max-w-xs`}
+              style={{
+                animation: 'countdownGlow 3s ease-in-out infinite',
                 position: 'relative',
                 zIndex: 1
               }}>
-                {dots.split('').map((dot, index) => (
-                  <span 
-                    key={index}
-                    style={{
-                      display: 'inline-block',
-                      minWidth: '0.5em',
-                      textAlign: 'center',
-                      color: (index === 2 && showBlinkingDot) ? 
-                        (isDarkMode ? "#00C8C8" : "#00AAAA") : 
-                        (index < 2 ? (isDarkMode ? "#FFD700" : "#00AAAA") : 'transparent'),
-                      transition: 'color 0.3s ease-in-out',
-                      opacity: (index === 2 && !showBlinkingDot) ? 0 : 1
-                    }}
-                  >
-                    {dot}
-                  </span>
-                ))}
-              </span>
-            )}
+              
+              {/* Dual-tone inner glow */}
+              <div className="absolute inset-0 overflow-hidden rounded-xl">
+                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-yellow-400/15 to-transparent"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-teal-400/15 to-transparent"></div>
+              </div>
+              
+              {/* Countdown grid */}
+              <div className="relative z-10">
+                <div className="grid grid-cols-4 gap-1">
+                  {[
+                    { value: timeLeft.days, label: 'Days' },
+                    { value: timeLeft.hours, label: 'Hours' },
+                    { value: timeLeft.minutes, label: 'Mins' },
+                    { value: timeLeft.seconds, label: 'Secs' },
+                  ].map((item, index) => (
+                    <div key={index} className="text-center">
+                      <div className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-teal-400 bg-clip-text text-transparent">
+                        {String(item.value).padStart(2, '0')}
+                      </div>
+                      <div className={`text-[9px] uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                        {item.label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                {/* Bottom gradient accent */}
+                <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-gradient-to-r from-yellow-400/70 via-teal-400 to-yellow-400/70 rounded-full mt-3"></div>
+              </div>
+            </div>
           </div>
-        </h1>
-        <p className={`text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto leading-relaxed mt-8 ${isDarkMode ? "text-gray-200" : "text-gray-800"}`} style={{ 
-          fontFamily: '"Balgin Display", sans-serif',
-          fontWeight: 500,
-          textShadow: isDarkMode ? "0 2px 8px rgba(0,0,0,0.6)" : "none",
-          animation: "textFloat 4s ease-in-out infinite"
-        }}>
-          <span>Where </span>
-          <span style={{ 
-            color: isDarkMode ? "#FFD700" : "#00AAAA",
-            fontWeight: 600
-          }}>Creativity meets Innovation</span>.<br />
-          <span>Where </span>
-          <span style={{ 
-            color: isDarkMode ? "#00C8C8" : "#00AAAA",
-            fontWeight: 600
-          }}>Artistry gets elevated</span>.
-        </p>
+        </div>
         
-        <style dangerouslySetInnerHTML={{
-          __html: `
-            @font-face {
-              font-family: 'Balgin Display';
-              src: url('/Fonts Style/BalginDisplay medium.otf') format('opentype');
-              font-weight: 500;
-              font-style: normal;
-              font-display: swap;
-            }
-            
-            @keyframes textFloat {
-              0%, 100% { transform: translateY(0); }
-              50% { transform: translateY(-4px); }
-            }
-            
-            @keyframes zoomFlip {
-              0% { opacity: 0; transform: scale(0.5) rotateY(90deg); }
-              100% { opacity: 1; transform: scale(1) rotateY(0); }
-            }
-            
-            @keyframes starTravelHero {
-              from { transform: translate(0, 0) scale(0.5); opacity: 0; }
-              to { transform: translate(50px, -30px) scale(1.5); opacity: 0.8; }
-            }
-            
-            @keyframes sparklePulse {
-              0%, 100% { opacity: 0.6; filter: brightness(1); }
-              50% { opacity: 1; filter: brightness(1.5); }
-            }
-            
-            @keyframes heroGlowOn {
-              from { filter: drop-shadow(0 0 0px rgba(0, 200, 200, 0)); }
-              to { filter: drop-shadow(0 0 20px rgba(0, 200, 200, 0.4)); }
-            }
-            
-            @keyframes logoGlowPulseGoldTeal {
-              0%, 100% { filter: drop-shadow(0 0 15px rgba(0, 200, 200, 0.4)) drop-shadow(0 0 30px rgba(0, 200, 200, 0.2)); }
-              50% { filter: drop-shadow(0 0 25px rgba(0, 200, 200, 0.6)) drop-shadow(0 0 50px rgba(0, 200, 200, 0.3)); }
-            }
-          `
-        }} />
-        
+        {/* Contact information */}
         <div className="mt-10">
-          <p className={`text-lg md:text-xl lg:text-2xl font-medium ${isDarkMode ? "text-gray-200" : "text-gray-800"}`}>
+          <p 
+            className={`text-lg md:text-xl lg:text-xl font-normal ${
+              isDarkMode ? "text-gray-200" : "text-gray-800"
+            }`} 
+            style={{ fontFamily: '"Playfair Display", serif' }}
+          >
             <span>Contact us at</span>:{' '}
             <a 
               href="mailto:contact@keyswithkani.ca" 
-              className={`font-bold ${isDarkMode ? "text-[#FFD700] hover:text-[#00C8C8]" : "text-[#00AAAA] hover:text-[#00C8C8]"}`}
+              className={`font-bold ${
+                isDarkMode 
+                  ? "text-[#FFC000] hover:text-[#00C8C8]" 
+                  : "text-[#00AAAA] hover:text-[#00C8C8]"
+              }`}
             >
               contact@keyswithkani.ca
             </a>

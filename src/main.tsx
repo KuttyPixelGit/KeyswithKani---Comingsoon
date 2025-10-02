@@ -60,19 +60,12 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 // Lazy load the App component to catch any loading errors
 const App = React.lazy(() => import('./App'));
 
-// Loading fallback
+// Loading fallback - Empty state with just the background
 const LoadingFallback = () => (
   <div style={{
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
     height: '100vh',
-    backgroundColor: '#1a1a1a',
-    color: 'white',
-    fontSize: '1.2rem'
-  }}>
-    Loading application...
-  </div>
+    backgroundColor: '#1a1a1a'
+  }} />
 );
 // Main App with Error Boundary
 const AppWithErrorBoundary = () => (

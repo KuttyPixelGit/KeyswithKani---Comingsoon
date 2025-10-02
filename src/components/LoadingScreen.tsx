@@ -70,20 +70,36 @@ const LoadingScreen: React.FC = () => {
             
             <div style={{ width: "min(90vw, 900px)", perspective: "1000px", transformStyle: "preserve-3d", position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <div style={{ transformOrigin: "50% 50%", backfaceVisibility: "hidden", willChange: "transform, opacity", animation: "zoomFlip .7s cubic-bezier(.2,.7,.2,1) .1s both", display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {/* Using GIF logo in loading screen with edges and glow effects like main page */}
+                {/* Logo with same animation as main page */}
                 <div className="relative inline-block">
-                  {/* Main page style edges and glow effects */}
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#FFD700] to-[#00C8C8] opacity-30 blur-xl -z-10 animate-pulse"></div>
-                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#FFD700] to-[#00C8C8] opacity-20 blur-3xl -z-20"></div>
+                  {/* Sparkle effect */}
+                  <div className="absolute -right-10 -top-8 w-1 h-1 rounded-full" style={{ 
+                    background: 'radial-gradient(circle, #ffffff 0%, #FFD700 30%, #00C8C8 60%, rgba(0,200,200,0) 70%)', 
+                    boxShadow: '0 0 12px rgba(255,215,0,0.95), 0 0 20px rgba(0,200,200,0.55)',
+                    animation: 'starTravelHero .5s ease-out .3s forwards, sparklePulse .6s ease-in-out .3s infinite alternate',
+                    filter: 'drop-shadow(0 0 6px rgba(255,215,0,0.85))',
+                    pointerEvents: 'none'
+                  }}></div>
+                  
+                  {/* Logo with glow */}
                   <img 
                     src="/keyswithKani.gif" 
                     alt="Keyswithkani" 
-                    className="h-24 md:h-36 lg:h-48 w-auto mx-auto relative z-10"
+                    className="h-24 md:h-36 lg:h-48 w-auto mx-auto" 
                     style={{ 
-                      filter: 'drop-shadow(0 0 16px rgba(0,200,200,0.45))',
-                      borderRadius: 16 // Matching main page style
+                      filter: 'none', 
+                      borderRadius: 16,
+                      animation: 'logoGlowPulseGoldTeal 4s ease-in-out 1.05s infinite alternate'
                     }} 
                   />
+                  
+                  {/* Glow effect */}
+                  <div className="absolute inset-0 -z-10" style={{
+                    background: 'radial-gradient(circle at center, rgba(0,200,200,0.4) 0%, rgba(0,200,200,0) 60%)',
+                    filter: 'blur(15px)',
+                    opacity: 0.7,
+                    animation: 'pulseGlow 3s ease-in-out infinite'
+                  }}></div>
                 </div>
               </div>
               {/* Elegant loading text */}

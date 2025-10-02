@@ -55,16 +55,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || 'smtp.gmail.com',
       port: parseInt(process.env.SMTP_PORT || '587'),
-      secure: false, // true for 465, false for other ports
+      secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD, // Note: Changed from SMTP_PASS to SMTP_PASSWORD
+        pass: process.env.SMTP_PASSWORD
       },
       tls: {
         // Only disable in development
         rejectUnauthorized: process.env.NODE_ENV !== 'production'
       },
-      debug: process.env.NODE_ENV !== 'production', // Enable debug logging in development
       logger: process.env.NODE_ENV !== 'production' // Log information in development
     });
 
