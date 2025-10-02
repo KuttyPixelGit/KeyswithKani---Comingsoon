@@ -3,41 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/png" href="/Icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="/Icon.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/Icon.png">
-    <link rel="shortcut icon" href="/Icon.png">
-    <link rel="apple-touch-icon" href="/Icon.png">
-    <meta name="theme-color" content="#000000">
-    <!-- Preload critical resources -->
-    <link rel="preload" href="/Icon.png" as="image">
-    <link rel="preload" href="/keyswithKani.gif" as="image">
-    <link rel="preload" href="/Kani.png" as="image">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Keyswithkani - Coming Soon</title>
-    <!-- Load local fonts -->
     <link rel="stylesheet" href="/fonts.css">
-    <!-- Optimize Tailwind CSS delivery -->
     <script src="https://cdn.tailwindcss.com"></script>
-  <!-- React is loaded via npm packages -->
-</head>
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/Icon.png" as="image">
+    <link rel="preload" href="/Kani.png" as="image">
+    <link rel="preload" href="/keyswithKani.gif" as="image">
+  </head>
   <body>
     <div id="root">Loading...</div>
-    <script type="module" src="/index.tsx"></script>
-    <script>
-      // Fallback error handling
-      window.addEventListener('error', function(e) {
-        console.error('Script loading error:', e);
-        const root = document.getElementById('root');
-        if (root) {
-          root.innerHTML = `
-            <div style="text-align: center; padding: 2rem; font-family: Arial, sans-serif;">
-              <h1>Something went wrong</h1>
-              <p>Please refresh the page or try again later.</p>
-              <p style="color: #666; margin-top: 2rem;">Error: ${e.message}</p>
-            </div>
-          `;
-        }
-      });
-    </script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

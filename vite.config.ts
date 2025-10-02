@@ -16,36 +16,40 @@ export default defineConfig(({ mode }) => {
   return {
     // Configure esbuild for React
     esbuild: {
-      jsxFactory: 'React.createElement',
-      jsxFragment: 'React.Fragment',
-      // Don't inject React import here as it's already imported in the files
+      jsx: 'automatic',
+      jsxImportSource: 'react'
     },
-    base: './',
+    base: '/',
     publicDir: 'public',
     plugins: [apiPlugin()],
     build: {
       outDir: 'dist',
       assetsDir: 'assets',
-      sourcemap: !isProduction,
+      sourcemap: false, // Disable sourcemaps in production
       minify: isProduction ? 'esbuild' : false,
       emptyOutDir: true,
       target: 'esnext',
       modulePreload: true,
       cssCodeSplit: true,
       commonjsOptions: {
-        transformMixedEsModules: true
+        transformMixedEsModules: true,
+        esmExternals: true
       },
       rollupOptions: {
         input: {
           main: './index.html',
         },
         output: {
+          manualChunks: {
+            react: ['react', 'react-dom'],
+            vendor: ['lucide-react']
+          },
           entryFileNames: 'assets/[name]-[hash].js',
           chunkFileNames: 'assets/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash][extname]'
         },
         external: ['nodemailer', 'fs', 'path', 'os', 'child_process']
-      }
+      },
     },
     server: {
       port: 5173,

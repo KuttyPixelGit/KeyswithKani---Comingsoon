@@ -74,18 +74,17 @@ const LoadingFallback = () => (
     Loading application...
   </div>
 );
-
 // Main App with Error Boundary
 const AppWithErrorBoundary = () => (
   <ErrorBoundary>
     <React.Suspense fallback={<LoadingFallback />}>
-      <App />
-      <Analytics />
+      <React.StrictMode>
+        <App />
+        <Analytics />
+      </React.StrictMode>
     </React.Suspense>
   </ErrorBoundary>
 );
-
-// Initialize the app
 const rootElement = document.getElementById('root');
 if (!rootElement) {
   throw new Error("Could not find root element to mount to");
