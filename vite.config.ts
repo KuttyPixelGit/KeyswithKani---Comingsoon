@@ -45,7 +45,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'dist',
       assetsDir: 'assets',
       sourcemap: !isProduction,
-      minify: isProduction ? 'terser' : false,
+      minify: isProduction ? 'esbuild' : false,
       emptyOutDir: true,
       rollupOptions: {
         external: ['nodemailer', 'fs', 'path', 'os', 'child_process'],
