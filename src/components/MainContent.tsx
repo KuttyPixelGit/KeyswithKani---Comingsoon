@@ -153,15 +153,17 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         <h1
           style={{
             ...styles.heading,
-            fontSize: '3rem',
+            fontFamily: 'PARTMEDIA, sans-serif',
+            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
             marginTop: '1.5rem',
             background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
-            lineHeight: '1.3',
-            letterSpacing: '0.5px',
+            lineHeight: '1.2',
+            letterSpacing: '0.1em',
             whiteSpace: 'nowrap',
-            fontWeight: 400,
+            textTransform: 'uppercase',
+            fontWeight: 'normal',
             textShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
           }}
         >
@@ -171,40 +173,33 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
               display: 'inline-flex',
               alignItems: 'center',
               marginLeft: '0.1em',
-              letterSpacing: '0.2em'
+              letterSpacing: '0',
+              fontFamily: 'inherit'
             }}>
               <span style={{
                 background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
                 WebkitBackgroundClip: 'text',
                 WebkitTextFillColor: 'transparent',
-                position: 'relative',
                 display: 'inline-block',
-                width: '1.5em',
-                textAlign: 'left'
+                fontFamily: 'inherit',
+                letterSpacing: '0.2em',
+                marginLeft: '0.1em',
+                position: 'relative',
+                paddingRight: '0.3em'
               }}>
-                <span style={{ 
-                  opacity: 1,
-                  letterSpacing: '0.1em',
-                  display: 'inline-block',
-                  width: '1.2em',
-                  textAlign: 'center'
-                }}>
-                  <span style={{ marginRight: '0.1em' }}>.</span>
-                  <span style={{ marginRight: '0.1em' }}>.</span>
-                </span>
+                ..
                 <span style={{
                   position: 'absolute',
-                  right: 0,
-                  top: 0,
+                  right: '-0.1em',
+                  top: '0',
                   opacity: showBlinkingDot ? 1 : 0,
                   transition: 'opacity 0.5s ease-in-out',
                   background: 'inherit',
                   WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  letterSpacing: '0.1em',
-                  width: '0.4em',
-                  textAlign: 'center'
-                }}>.</span>
+                  WebkitTextFillColor: 'transparent'
+                }}>
+                  .
+                </span>
               </span>
             </span>
           )}

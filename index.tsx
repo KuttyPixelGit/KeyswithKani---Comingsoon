@@ -58,7 +58,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
 }
 
 // Lazy load the App component to catch any loading errors
-const App = React.lazy(() => import('./App'));
+const App = React.lazy(() => import('./src/App'));
 
 // Loading fallback
 const LoadingFallback = () => (

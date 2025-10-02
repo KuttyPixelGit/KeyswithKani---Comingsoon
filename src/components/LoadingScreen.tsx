@@ -1,4 +1,5 @@
 import React, { useEffect, useState, memo } from 'react';
+import '../styles/fonts.css';
 
 const LoadingScreen: React.FC = () => {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
@@ -104,8 +105,8 @@ const LoadingScreen: React.FC = () => {
               </div>
               {/* Elegant loading text */}
               <div className="mt-8 relative z-10 text-center">
-                <h2 className="text-4xl md:text-5xl font-light" style={{
-                  fontFamily: '"Cormorant Garamond", serif',
+                <h2 className="text-5xl md:text-7xl" style={{
+                  fontFamily: 'PARTMEDIA, sans-serif',
                   letterSpacing: '0.1em',
                   fontWeight: 400,
                   color: '#fff',
@@ -114,17 +115,13 @@ const LoadingScreen: React.FC = () => {
                   <span style={{
                     background: 'linear-gradient(90deg, #FFD700 0%, #00C8C8 100%)',
                     WebkitBackgroundClip: 'text',
-                    WebkitTextFillColor: 'transparent',
-                    fontWeight: 500
+                    WebkitTextFillColor: 'transparent'
                   }}>
-                    keyswith.<span style={{ fontStyle: 'italic' }}>Kani</span>
+                    Keyswithkani
                   </span>
                 </h2>
                 <div className="mt-4 h-1 w-24 bg-gradient-to-r from-[#FFD700] to-[#00C8C8] mx-auto rounded-full" />
               </div>
-              <style dangerouslySetInnerHTML={{
-                __html: `@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');`
-              }} />
             </div>
           </div>
         </div>

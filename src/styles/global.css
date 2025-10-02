@@ -9,6 +9,17 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+@font-face {
+  font-family: 'PARTMEDIA';
+  src: url('/Fonts Style/Partmedia.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 /* Base font smoothing and text rendering */
 html, body {
   -webkit-text-size-adjust: 100%;
