@@ -242,8 +242,8 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
           <div className="relative z-10 text-center">
             <div className="mb-10">
               <h2 className="text-lg md:text-xl font-medium mb-3 bg-gradient-to-r from-yellow-300 to-teal-400 bg-clip-text text-transparent leading-tight">
-                We are now active!<br />
-                <span className="text-sm md:text-base">Website launching in production soon</span>
+              We are active now to guide your next home<br />
+                <span className="text-sm md:text-base font-extrabold tracking-wide">WE'RE LAUNCHING IN PRODUCTION SOON</span>
               </h2>
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 January 1, 2026
