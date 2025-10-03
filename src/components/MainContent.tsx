@@ -154,7 +154,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
           style={{
             ...styles.heading,
             fontFamily: '"ARTHA", sans-serif',
-            fontSize: 'clamp(1.2rem, 3vw, 2rem)',
+            fontSize: 'clamp(1.4rem, 3.5vw, 2.3rem)',
             marginTop: '1.5rem',
             background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
             WebkitBackgroundClip: 'text',
@@ -240,12 +240,15 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         {/* Compact Countdown */}
         <div className="relative mt-10 mb-12 w-full max-w-md mx-auto px-4">
           <div className="relative z-10 text-center">
-            <h2 className="text-xl md:text-2xl font-medium mb-1 bg-gradient-to-r from-yellow-300 to-teal-400 bg-clip-text text-transparent">
-              We're Launching In
-            </h2>
-            <p className={`text-xs mb-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              January 1, 2026
-            </p>
+            <div className="mb-10">
+              <h2 className="text-lg md:text-xl font-medium mb-3 bg-gradient-to-r from-yellow-300 to-teal-400 bg-clip-text text-transparent leading-tight">
+                We are now active!<br />
+                <span className="text-sm md:text-base">Website launching in production soon</span>
+              </h2>
+              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                January 1, 2026
+              </p>
+            </div>
             
             {/* Compact countdown box */}
             <div className={`relative rounded-xl overflow-hidden transition-all duration-300 mx-auto
