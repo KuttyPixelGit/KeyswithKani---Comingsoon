@@ -15,7 +15,7 @@ interface HeroSectionProps {
 }
 
 const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) => {
-  const fullHeadline = "Get Ready to Open the Door...";
+  const fullHeadline = "GET READY TO OPEN THE DOOR";
   const { displayText, showBlinkingDot, typingComplete } = useTypewriter(
     fullHeadline,
     showContent
@@ -154,7 +154,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
           style={{
             ...styles.heading,
             fontFamily: '"ARTHA", sans-serif',
-            fontSize: 'clamp(1.5rem, 3.5vw, 2.5rem)',
+            fontSize: 'clamp(1.2rem, 3vw, 2rem)',
             marginTop: '1.5rem',
             background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
             WebkitBackgroundClip: 'text',
