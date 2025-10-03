@@ -446,14 +446,12 @@ const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode })
           {/* About Section */}
           <div className="text-center lg:text-left">
             <h2 className="text-4xl md:text-5xl mb-6 bg-gradient-to-r from-[#FFD700] to-[#00C8C8] bg-clip-text text-transparent" style={{ 
-              fontFamily: '"Playfair Display", serif',
-              fontWeight: 600,
-              fontStyle: 'italic',
-              letterSpacing: '0.02em',
+              fontFamily: '"ARTHA", sans-serif',
+              fontWeight: 'bold',
+              letterSpacing: '0.1em',
               lineHeight: '1.2',
-              textShadow: isDarkMode ? "0 2px 3px rgba(0,0,0,0.3), 0 0 12px rgba(255,215,0,0.3)" : "0 1px 2px rgba(0,0,0,0.2), 0 0 8px rgba(0,200,200,0.2)",
-              wordSpacing: '0.1em',
-              textTransform: 'none'
+              textShadow: isDarkMode ? "0 2px 4px rgba(0,0,0,0.3)" : "0 2px 4px rgba(0,0,0,0.1)",
+              textTransform: 'uppercase'
             }}>
               Meet Kani
             </h2>
