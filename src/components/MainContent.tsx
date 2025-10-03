@@ -153,8 +153,8 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         <h1
           style={{
             ...styles.heading,
-            fontFamily: 'PARTMEDIA, sans-serif',
-            fontSize: 'clamp(2.5rem, 6vw, 4rem)',
+            fontFamily: '"ARTHA", sans-serif',
+            fontSize: 'clamp(1.5rem, 3.5vw, 2.5rem)',
             marginTop: '1.5rem',
             background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
             WebkitBackgroundClip: 'text',
@@ -163,7 +163,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
             letterSpacing: '0.1em',
             whiteSpace: 'nowrap',
             textTransform: 'uppercase',
-            fontWeight: 'normal',
+            fontWeight: 'bold',
             textShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
           }}
         >

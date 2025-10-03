@@ -1,4 +1,49 @@
 @font-face {
+  font-family: 'Crambleregular';
+  src: url('/Fonts Style/CrambleRegular-gxG2R.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'Architext';
+  src: url('/Fonts Style/Architex.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'Garline';
+  src: url('/Fonts Style/garline.otf') format('opentype'),
+       url('/Fonts Style/garline.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'Paragraph';
+  src: url('/Fonts Style/Paragraph.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
   font-family: 'Balgin Display';
   src: url('/Fonts Style/BalginDisplay medium.otf') format('opentype');
   font-weight: 500;
@@ -13,6 +58,30 @@
   font-family: 'PARTMEDIA';
   src: url('/Fonts Style/Partmedia.otf') format('opentype');
   font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'ARTHA';
+  src: url('/Fonts Style/ARTHA.otf') format('opentype'),
+       url('/Fonts Style/ARTHA.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@font-face {
+  font-family: 'ARTHA';
+  src: url('/Fonts Style/ARTHA BOLD.otf') format('opentype'),
+       url('/Fonts Style/ARTHA BOLD.ttf') format('truetype');
+  font-weight: bold;
   font-style: normal;
   font-display: swap;
   text-rendering: optimizeLegibility;

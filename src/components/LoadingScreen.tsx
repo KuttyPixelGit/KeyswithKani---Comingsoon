@@ -105,10 +105,10 @@ const LoadingScreen: React.FC = () => {
               </div>
               {/* Elegant loading text */}
               <div className="mt-8 relative z-10 text-center">
-                <h2 className="text-5xl md:text-7xl" style={{
-                  fontFamily: 'PARTMEDIA, sans-serif',
-                  letterSpacing: '0.1em',
-                  fontWeight: 400,
+                <h2 className="text-4xl md:text-5xl" style={{
+                  fontFamily: '"Crambleregular", sans-serif',
+                  letterSpacing: '0.05em',
+                  fontWeight: 'normal',
                   color: '#fff',
                   textShadow: '0 2px 4px rgba(0,0,0,0.3)'
                 }}>
