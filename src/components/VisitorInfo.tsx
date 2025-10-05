@@ -45,19 +45,25 @@ const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
   const [lastEmailSent, setLastEmailSent] = useState<Date | null>(null);
   const [lastUpdateDate, setLastUpdateDate] = useState<string>('');
 
-  // Calculate daily visitor count with natural variation
+  // Track visitor counts with state
+  const [todaysCount, setTodaysCount] = useState(Math.floor(Math.random() * 5) + 1); // Start with 1-5 visitors
+  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  
+  // Calculate visitor count with gradual daily increase
   const calculateDailyCount = useCallback((): VisitorCount => {
-    const today = new Date();
-    const todayString = today.toDateString();
+    const now = new Date();
+    const todayString = now.toDateString();
     
-    // Base starting count - reset to today's date
+    // Base starting count
     const baseCount = 4038; // Starting from 4,038
     
-    // Always treat today as the first day
-    const daysSinceStart = 0;
+    // Get time progress through the day (0 to 1)
+    const minutesInDay = 24 * 60;
+    const currentMinute = now.getHours() * 60 + now.getMinutes();
+    const minuteProgress = currentMinute / minutesInDay;
     
     // Generate a daily seed based on the date for consistent daily values
-    const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const dateSeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
     const random = (seed: number) => {
       const x = Math.sin(seed) * 10000;
       return x - Math.floor(x);
@@ -67,13 +73,16 @@ const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
     const dailyVariation = Math.floor(random(dateSeed) * 27) - 13; // -13 to +13
     const dailyIncrement = 43 + dailyVariation;
     
-    // Calculate total count - just the base count plus today's visitors
-    const totalCount = baseCount + dailyIncrement;
+    // Calculate today's target visitors so far
+    const targetTodaysVisitors = Math.floor(dailyIncrement * Math.min(1, minuteProgress));
+    
+    // Calculate total count
+    const totalCount = baseCount + targetTodaysVisitors;
     
     return {
-      totalCount,
-      todaysVisitors: dailyIncrement,
-      lastUpdated: today
+      totalCount: baseCount + todaysCount,
+      todaysVisitors: todaysCount,
+      lastUpdated: now
     };
   }, []);
 
@@ -102,35 +111,73 @@ const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
   };
 
   useEffect(() => {
-    // Set initial count
-    const { totalCount } = calculateDailyCount();
-    setDisplayCount(totalCount);
+    // Update every 30-90 seconds for smooth progression
+    const getNextUpdateTime = () => (30 + Math.random() * 60) * 1000; // 30-90 seconds
     
-    // Update once per day at midnight
-    const updateAtMidnight = () => {
+    // Function to update the counter
+    const updateCounter = () => {
       const now = new Date();
-      const midnight = new Date(now);
-      midnight.setHours(24, 0, 0, 0); // Next midnight
+      const hours = now.getHours();
       
-      const timeUntilMidnight = midnight.getTime() - now.getTime();
+      // More visitors during peak hours (10 AM - 10 PM)
+      const isPeakHours = hours >= 10 && hours < 22;
+      const baseIncrement = isPeakHours ? 2 : 1;
+      const randomIncrement = Math.floor(Math.random() * (isPeakHours ? 3 : 2)); // 0-2 or 0-1
+      const increment = baseIncrement + randomIncrement;
       
-      return setTimeout(() => {
-        const newCounts = calculateDailyCount();
-        setDisplayCount(newCounts.totalCount);
-        setLastUpdateDate(now.toDateString());
-        
-        // Schedule next update for the following day
-        updateAtMidnight();
-      }, timeUntilMidnight);
+      setTodaysCount(prev => {
+        const newCount = prev + increment;
+        // Calculate daily target based on time of day (30-56 per day)
+        const dailyTarget = 43 + (Math.sin(now.getDate()) * 13); // 30-56
+        const maxForToday = Math.min(
+          dailyTarget,
+          dailyTarget * (now.getHours() / 24) * 1.5 // Cap at 1.x the expected for current hour
+        );
+        return Math.min(newCount, Math.floor(maxForToday));
+      });
+      
+      // Schedule next update
+      const nextUpdate = getNextUpdateTime();
+      const timeoutId = setTimeout(updateCounter, nextUpdate);
+      
+      return () => clearTimeout(timeoutId);
+      
     };
     
-    // Start the daily update cycle
-    const timeoutId = updateAtMidnight();
-
+    // Initial update
+    const timeoutId = setTimeout(updateCounter, getNextUpdateTime());
+    
+    // Reset at midnight
+    const now = new Date();
+    const midnight = new Date(now);
+    midnight.setHours(24, 0, 0, 0);
+    const timeUntilMidnight = midnight.getTime() - now.getTime();
+    
+    const midnightTimeout = setTimeout(() => {
+      setTodaysCount(Math.floor(Math.random() * 3) + 1); // Start new day with 1-3 visitors
+    }, timeUntilMidnight);
+    
+    // Cleanup
     return () => {
       clearTimeout(timeoutId);
+      clearTimeout(midnightTimeout);
     };
-  }, [calculateDailyCount]);
+  }, []);
+  
+  // Update display count whenever today's count changes
+  useEffect(() => {
+    if (todaysCount > 0) { // Only update if we have visitors
+      setDisplayCount(4038 + todaysCount);
+      setLastUpdateDate(new Date().toLocaleTimeString());
+      
+      // Force a re-render to ensure the counter updates
+      const timer = setTimeout(() => {
+        setTodaysCount(prev => Math.max(prev, todaysCount));
+      }, 100);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [todaysCount]);
 
   const cardClasses = `p-3 rounded-lg text-xs whitespace-nowrap backdrop-blur-md border transition-all duration-300 ${
     isDarkMode
