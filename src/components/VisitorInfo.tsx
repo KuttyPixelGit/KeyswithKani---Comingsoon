@@ -1,239 +1,220 @@
-import * as React from 'react';
-import { useState, useEffect, useCallback } from 'react';
-import { FC } from 'react';
-
-interface EyeIconProps {
-  className?: string;
-}
-
-const EyeIcon: FC<EyeIconProps> = ({ className }) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    className={className}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-    />
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-    />
-  </svg>
-);
+import React, { useState, useEffect } from 'react';
+import EyeIcon from './icons/EyeIcon';
 
 interface VisitorInfoProps {
   isDarkMode: boolean;
 }
 
-interface VisitorCount {
-  totalCount: number;
-  todaysVisitors: number;
-  lastUpdated: Date;
-}
-
 const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [displayCount, setDisplayCount] = useState(4038);
-  const [lastEmailSent, setLastEmailSent] = useState<Date | null>(null);
-  const [lastUpdateDate, setLastUpdateDate] = useState<string>('');
+  const [todayCount, setTodayCount] = useState(0);
+  const [weeklyCount, setWeeklyCount] = useState(0);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
-  // Track visitor counts with state
-  const [todaysCount, setTodaysCount] = useState(Math.floor(Math.random() * 27) + 12); // Start with 12-38 visitors
-  const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
-  
-  // Calculate visitor count with gradual daily increase
-  const calculateDailyCount = useCallback((): VisitorCount => {
-    const now = new Date();
-    const todayString = now.toDateString();
-    
-    // Base starting count
-    const baseCount = 4038; // Starting from 4,038
-    
-    // Get time progress through the day (0 to 1)
-    const minutesInDay = 24 * 60;
-    const currentMinute = now.getHours() * 60 + now.getMinutes();
-    const minuteProgress = currentMinute / minutesInDay;
-    
-    // Generate a daily seed based on the date for consistent daily values
-    const dateSeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
-    const random = (seed: number) => {
-      const x = Math.sin(seed) * 10000;
-      return x - Math.floor(x);
-    };
-    
-    // Generate a random but consistent daily visitor count between 30-56 (average ~43)
-    const dailyVariation = Math.floor(random(dateSeed) * 27) - 13; // -13 to +13
-    const dailyIncrement = 43 + dailyVariation;
-    
-    // Calculate today's target visitors so far
-    const targetTodaysVisitors = Math.floor(dailyIncrement * Math.min(1, minuteProgress));
-    
-    // Calculate total count
-    const totalCount = baseCount + targetTodaysVisitors;
-    
-    return {
-      totalCount: baseCount + todaysCount,
-      todaysVisitors: todaysCount,
-      lastUpdated: now
-    };
-  }, []);
-
-  // Function to animate the counter
-  const animateCounter = (target: number) => {
-    const duration = 2000; // 2 seconds for the animation
-    const start = displayCount;
-    const difference = target - start;
-    if (difference === 0) return () => {};
-    
-    const stepTime = Math.max(10, Math.min(50, Math.floor(duration / Math.abs(difference))));
-    const increment = difference > 0 ? 1 : -1;
-
-    const timer = setInterval(() => {
-      setDisplayCount(prev => {
-        const newCount = prev + increment;
-        if ((increment > 0 && newCount >= target) || (increment < 0 && newCount <= target)) {
-          clearInterval(timer);
-          return target;
-        }
-        return newCount;
-      });
-    }, stepTime);
-
-    return () => clearInterval(timer);
-  };
-
+  // Initialize or update counts from localStorage
   useEffect(() => {
-    // Update every 30-90 seconds for smooth progression
-    const getNextUpdateTime = () => (30 + Math.random() * 60) * 1000; // 30-90 seconds
+    const today = new Date().toDateString();
+    const storedDate = localStorage.getItem('lastUpdated');
+    let storedTodayCount = parseInt(localStorage.getItem('todayCount') || '0');
+    let storedWeeklyCount = 2039; // Set initial weekly count to 2039
     
-    // Function to update the counter
-    const updateCounter = () => {
-      const now = new Date();
-      const hours = now.getHours();
+    // Base daily increase between 50-60
+    const getDailyIncrease = () => 50 + Math.floor(Math.random() * 11);
+    // Weekly multiplier between 7-10x
+    const getWeeklyMultiplier = () => 7 + Math.floor(Math.random() * 4);
+
+    // Check if it's a new day
+    if (storedDate !== today) {
+      const isNewWeek = storedDate && (new Date(storedDate).getDay() === 0);
+      const dailyIncrease = getDailyIncrease();
       
-      // More visitors during peak hours (10 AM - 10 PM)
-      const isPeakHours = hours >= 10 && hours < 22;
-      const baseIncrement = isPeakHours ? 2 : 1;
-      const randomIncrement = Math.floor(Math.random() * (isPeakHours ? 3 : 2)); // 0-2 or 0-1
-      const increment = baseIncrement + randomIncrement;
+      // Calculate new counts
+      const newTodayCount = storedDate ? dailyIncrease : getDailyIncrease();
       
-      setTodaysCount(prev => {
-        const newCount = prev + increment;
-        // Calculate daily target based on time of day (30-56 per day)
-        const dailyTarget = 43 + (Math.sin(now.getDate()) * 13); // 30-56
-        const maxForToday = Math.min(
-          dailyTarget,
-          dailyTarget * (now.getHours() / 24) * 1.5 // Cap at 1.x the expected for current hour
-        );
-        return Math.min(newCount, Math.floor(maxForToday));
-      });
+      // Calculate weekly count to be 7-10x today's count
+      const multiplier = getWeeklyMultiplier();
+      let newWeeklyCount = newTodayCount * multiplier;
       
-      // Schedule next update
-      const nextUpdate = getNextUpdateTime();
-      const timeoutId = setTimeout(updateCounter, nextUpdate);
+      // If not a new week, make sure weekly count is at least 7x today's count
+      if (!isNewWeek && storedWeeklyCount > 0) {
+        newWeeklyCount = Math.max(storedWeeklyCount, newTodayCount * 7);
+      }
       
-      return () => clearTimeout(timeoutId);
-      
-    };
-    
-    // Initial update
-    const timeoutId = setTimeout(updateCounter, getNextUpdateTime());
-    
-    // Reset at midnight
-    const now = new Date();
-    const midnight = new Date(now);
-    midnight.setHours(24, 0, 0, 0);
-    const timeUntilMidnight = midnight.getTime() - now.getTime();
-    
-    const midnightTimeout = setTimeout(() => {
-      setTodaysCount(Math.floor(Math.random() * 10) + 5); // Start new day with 5-14 visitors
-    }, timeUntilMidnight);
-    
-    // Cleanup
-    return () => {
-      clearTimeout(timeoutId);
-      clearTimeout(midnightTimeout);
-    };
-  }, []);
-  
-  // Update display count whenever today's count changes
-  useEffect(() => {
-    if (todaysCount > 0) { // Only update if we have visitors
-      setDisplayCount(4038 + todaysCount);
-      setLastUpdateDate(new Date().toLocaleTimeString());
-      
-      // Force a re-render to ensure the counter updates
-      const timer = setTimeout(() => {
-        setTodaysCount(prev => Math.max(prev, todaysCount));
-      }, 100);
-      
-      return () => clearTimeout(timer);
+      // Update state and storage
+      setTodayCount(newTodayCount);
+      setWeeklyCount(newWeeklyCount);
+      localStorage.setItem('todayCount', newTodayCount.toString());
+      localStorage.setItem('weeklyCount', newWeeklyCount.toString());
+      localStorage.setItem('lastUpdated', today);
+    } else {
+      // Same day, ensure weekly is at least 7x today's count
+      const minWeeklyCount = Math.max(storedWeeklyCount, storedTodayCount * 7);
+      setTodayCount(storedTodayCount);
+      setWeeklyCount(minWeeklyCount);
+      if (minWeeklyCount > storedWeeklyCount) {
+        localStorage.setItem('weeklyCount', minWeeklyCount.toString());
+      }
     }
-  }, [todaysCount]);
+    
+    setLastUpdated(new Date());
 
-  const cardClasses = `p-3 rounded-lg text-xs whitespace-nowrap backdrop-blur-md border transition-all duration-300 ${
+    // Simulate visitor growth over time
+    const updateInterval = setInterval(() => {
+      setTodayCount(prevToday => {
+        const increment = Math.floor(Math.random() * 3) + 1; // 1-3
+        const newTodayCount = prevToday + increment;
+        localStorage.setItem('todayCount', newTodayCount.toString());
+        
+        // Update weekly count to be at least 7x today's count
+        setWeeklyCount(prevWeekly => {
+          const minWeeklyCount = Math.max(prevWeekly, newTodayCount * 7);
+          const weeklyIncrement = Math.floor(Math.random() * 3) + 1; // 1-3
+          const newWeeklyCount = Math.max(minWeeklyCount, prevWeekly + weeklyIncrement);
+          localStorage.setItem('weeklyCount', newWeeklyCount.toString());
+          return newWeeklyCount;
+        });
+        
+        return newTodayCount;
+      });
+      
+      // Update the last updated time
+      setLastUpdated(new Date());
+    }, 15000); // Update every 15 seconds for smoother animation
+
+    // Cleanup interval on component unmount
+    return () => {
+      clearInterval(updateInterval);
+    };
+  }, []);
+
+  const cardClasses = `p-4 rounded-lg backdrop-blur-md border-2 transition-all duration-300 text-white relative overflow-hidden group ${
     isDarkMode
-      ? "bg-black/30 border-[#00C8C8]/30 text-[#00C8C8] hover:bg-[#00C8C8]/20"
-      : "bg-white/70 border-[#00C8C8]/40 text-[#00C8C8] hover:bg-[#00C8C8]/20"
-  }`;
+      ? "bg-gradient-to-br from-black/60 to-gray-900/80 border-[#D4AF37]/50 hover:border-[#D4AF37]/80 shadow-lg"
+      : "bg-gradient-to-br from-white/90 to-gray-100/80 border-teal-300/50 hover:border-teal-400/80 shadow-lg"
+  } 
+    before:absolute before:inset-0 before:bg-gradient-to-r before:from-[#D4AF37]/10 before:to-[#00C4CC]/10 
+    before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300
+    after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] 
+    after:from-[#D4AF37]/5 after:via-transparent after:to-transparent after:opacity-0 
+    group-hover:after:opacity-100 after:transition-opacity after:duration-500 after:delay-100`;
 
-  const labelTextClasses = isDarkMode ? 'text-gray-400' : 'text-gray-500';
+  const buttonClasses = `p-3 rounded-full backdrop-blur-md border-2 transition-all duration-300 hover:scale-110 relative overflow-hidden group ${
+    isDarkMode
+      ? "bg-gradient-to-br from-black/60 to-gray-900/80 border-[#D4AF37]/50 hover:border-[#D4AF37]/80 text-[#D4AF37] hover:text-white shadow-lg"
+      : "bg-gradient-to-br from-white/90 to-gray-100/80 border-teal-300/50 hover:border-teal-400/80 text-teal-600 hover:text-teal-800 shadow-lg"
+  }
+    before:absolute before:inset-0 before:bg-gradient-to-r before:from-[#D4AF37]/20 before:to-[#00C4CC]/20 
+    before:opacity-0 group-hover:before:opacity-100 before:transition-opacity before:duration-300
+    after:absolute after:inset-0 after:bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] 
+    after:from-[#D4AF37]/10 after:via-transparent after:to-transparent after:opacity-0 
+    group-hover:after:opacity-100 after:transition-opacity after:duration-500 after:delay-100`;
   
   return (
-    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 transition-all duration-300 ease-in-out">
+    <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 transition-all duration-300 ease-in-out">
+      <style>{`
+        .glow-effect {
+          position: relative;
+        }
+        .glow-effect::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          border-radius: 0.5rem;
+          padding: 2px;
+          background: linear-gradient(45deg, #D4AF37, #00C4CC, #D4AF37);
+          -webkit-mask: 
+            linear-gradient(#fff 0 0) content-box, 
+            linear-gradient(#fff 0 0);
+          -webkit-mask-composite: xor;
+          mask-composite: exclude;
+          pointer-events: none;
+          opacity: 0.7;
+          transition: opacity 0.3s ease;
+        }
+        .glow-effect:hover::before {
+          opacity: 1;
+          animation: border-glow 2s ease-in-out infinite alternate;
+        }
+        @keyframes border-glow {
+          from {
+            box-shadow: 0 0 5px #D4AF37, 0 0 10px #D4AF37, 0 0 15px #D4AF37;
+          }
+          to {
+            box-shadow: 0 0 10px #D4AF37, 0 0 20px #D4AF37, 0 0 30px #D4AF37;
+          }
+        }
+      `}</style>
       {/* Toggle Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`p-3 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-110 ${
-          isDarkMode
-            ? 'bg-black/30 border-[#00C8C8]/30 text-[#00C8C8] hover:bg-[#00C8C8]/20'
-            : 'bg-white/70 border-[#00C8C8]/40 text-[#00C8C8] hover:bg-[#00C8C8]/20'
-        } ${isOpen ? 'rotate-180' : ''}`}
+        className={`${buttonClasses} ${isOpen ? 'rotate-180' : ''}`}
+        aria-label={isOpen ? 'Hide visitor info' : 'Show visitor info'}
       >
         <div className="relative">
-          <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+          <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-400 rounded-full animate-pulse"></div>
           <EyeIcon className="w-5 h-5" />
         </div>
       </button>
 
-      {/* Dropdown Content - Simplified to show only visitor count */}
-      <div className={`transition-all duration-300 ease-in-out overflow-hidden ${
-        isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-      }`}>
-        <div className="flex flex-col items-end gap-2 mt-2">
-          {/* Visitor Count Only */}
-          <div className={`${cardClasses} flex items-center gap-2`}>
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2 hover:scale-105 transition-transform duration-300">
-                <div className="relative">
-                  <span className="text-sm font-mono font-bold text-blue-600 dark:text-blue-400">
-                    {displayCount.toLocaleString()}
-                  </span>
-                  <span className="absolute -right-1 -top-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400">
-                  +{calculateDailyCount().todaysVisitors} today
-                </span>
+      {/* Dropdown Content */}
+      <div 
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+        }`}
+        aria-hidden={!isOpen}
+      >
+        <div className="flex flex-col items-end gap-3 mt-3">
+          {/* Today's Visitors */}
+          <div className={`${cardClasses} w-48 glow-effect`}>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-green-500/20 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
               </div>
-              <span className={`text-[10px] ${labelTextClasses}`}>Total Visitors</span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-white">{todayCount.toLocaleString()}</span>
+                <span className="text-xs text-white/80">Visitors Today</span>
+              </div>
+            </div>
+            <div className="mt-2 w-full bg-white/10 h-1 rounded-full overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-[#D4AF37] to-[#00C4CC] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_2px_rgba(212,175,55,0.4)]"
+                style={{ width: `${Math.min(100, (todayCount % 1000) / 10 + 20)}%` }}
+                aria-hidden="true"
+              ></div>
             </div>
           </div>
+
+          {/* Weekly Visitors */}
+          <div className={`${cardClasses} w-48 glow-effect`}>
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-blue-500/20 rounded-full">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-white">{weeklyCount.toLocaleString()}</span>
+                <span className="text-xs text-white/80">This Week</span>
+              </div>
+            </div>
+            <div className="mt-2 w-full bg-white/10 h-1 rounded-full overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-[#00C4CC] to-[#0077B6] h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_8px_2px_rgba(0,196,204,0.4)]"
+                style={{ width: `${Math.min(100, (weeklyCount % 5000) / 50 + 20)}%` }}
+                aria-hidden="true"
+              ></div>
+            </div>
+          </div>
+
+          {/* Last Updated */}
+          <div className="text-right">
+            <span className="text-xs font-medium text-[#FFD700] drop-shadow-[0_0_4px_rgba(255,215,0,0.7)]">
+              {lastUpdated && `Updated: ${lastUpdated.toLocaleTimeString()}`}
+            </span>
+          </div>
         </div>
-        <style>{`
-          @keyframes pulse {
-            0% { opacity: 0.7; }
-            50% { opacity: 1; }
-            100% { opacity: 0.7; }
-          }
-        `}</style>
       </div>
     </div>
   );
