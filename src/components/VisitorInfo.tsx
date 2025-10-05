@@ -46,7 +46,7 @@ const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
   const [lastUpdateDate, setLastUpdateDate] = useState<string>('');
 
   // Track visitor counts with state
-  const [todaysCount, setTodaysCount] = useState(Math.floor(Math.random() * 5) + 1); // Start with 1-5 visitors
+  const [todaysCount, setTodaysCount] = useState(Math.floor(Math.random() * 27) + 12); // Start with 12-38 visitors
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   
   // Calculate visitor count with gradual daily increase
@@ -154,7 +154,7 @@ const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
     const timeUntilMidnight = midnight.getTime() - now.getTime();
     
     const midnightTimeout = setTimeout(() => {
-      setTodaysCount(Math.floor(Math.random() * 3) + 1); // Start new day with 1-3 visitors
+      setTodaysCount(Math.floor(Math.random() * 10) + 5); // Start new day with 5-14 visitors
     }, timeUntilMidnight);
     
     // Cleanup
