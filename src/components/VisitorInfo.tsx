@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { FC } from 'react';
 
 interface EyeIconProps {
@@ -32,85 +33,112 @@ interface VisitorInfoProps {
   isDarkMode: boolean;
 }
 
+interface VisitorCount {
+  totalCount: number;
+  todaysVisitors: number;
+  lastUpdated: Date;
+}
+
 const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [visitorCount, setVisitorCount] = useState(1240); // Starting with a higher count for impression
+  const [displayCount, setDisplayCount] = useState(4038);
   const [lastEmailSent, setLastEmailSent] = useState<Date | null>(null);
+  const [lastUpdateDate, setLastUpdateDate] = useState<string>('');
 
-  // Function to send weekly email report
-  const sendWeeklyEmailReport = async () => {
-    try {
-      // Send email report via Vercel API endpoint
-      const response = await fetch('/api/send-visitor-report', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: 'contact@keyswithkani.ca',
-          visitorCount: visitorCount,
-          subject: `Weekly Visitor Report - ${new Date().toLocaleDateString()}`
-        }),
+  // Calculate daily visitor count with natural variation
+  const calculateDailyCount = useCallback((): VisitorCount => {
+    const today = new Date();
+    const todayString = today.toDateString();
+    
+    // Base starting count - reset to today's date
+    const baseCount = 4038; // Starting from 4,038
+    
+    // Always treat today as the first day
+    const daysSinceStart = 0;
+    
+    // Generate a daily seed based on the date for consistent daily values
+    const dateSeed = today.getFullYear() * 10000 + (today.getMonth() + 1) * 100 + today.getDate();
+    const random = (seed: number) => {
+      const x = Math.sin(seed) * 10000;
+      return x - Math.floor(x);
+    };
+    
+    // Generate a random but consistent daily visitor count between 30-56 (average ~43)
+    const dailyVariation = Math.floor(random(dateSeed) * 27) - 13; // -13 to +13
+    const dailyIncrement = 43 + dailyVariation;
+    
+    // Calculate total count - just the base count plus today's visitors
+    const totalCount = baseCount + dailyIncrement;
+    
+    return {
+      totalCount,
+      todaysVisitors: dailyIncrement,
+      lastUpdated: today
+    };
+  }, []);
+
+  // Function to animate the counter
+  const animateCounter = (target: number) => {
+    const duration = 2000; // 2 seconds for the animation
+    const start = displayCount;
+    const difference = target - start;
+    if (difference === 0) return () => {};
+    
+    const stepTime = Math.max(10, Math.min(50, Math.floor(duration / Math.abs(difference))));
+    const increment = difference > 0 ? 1 : -1;
+
+    const timer = setInterval(() => {
+      setDisplayCount(prev => {
+        const newCount = prev + increment;
+        if ((increment > 0 && newCount >= target) || (increment < 0 && newCount <= target)) {
+          clearInterval(timer);
+          return target;
+        }
+        return newCount;
       });
+    }, stepTime);
 
-      const result = await response.json();
-      
-      if (result.success) {
-        console.log('Weekly visitor report sent successfully');
-        // Store the last email sent date
-        setLastEmailSent(new Date());
-      } else {
-        console.error('Failed to send email report:', result.error);
-      }
-    } catch (error) {
-      console.error('Error sending email report:', error);
-    }
+    return () => clearInterval(timer);
   };
 
   useEffect(() => {
-    // Update visitor count periodically with random increments to create impression
-    const countInterval = setInterval(() => {
-      // Random increment between 1-3 to simulate activity
-      const increment = Math.floor(Math.random() * 3) + 1;
-      setVisitorCount(prev => prev + increment);
-    }, 10000); // Update every 10 seconds
-
-    // Check if it's time to send weekly email report (every 7 days)
-    const emailInterval = setInterval(() => {
+    // Set initial count
+    const { totalCount } = calculateDailyCount();
+    setDisplayCount(totalCount);
+    
+    // Update once per day at midnight
+    const updateAtMidnight = () => {
       const now = new Date();
-      if (!lastEmailSent || (now.getTime() - lastEmailSent.getTime()) > 7 * 24 * 60 * 60 * 1000) {
-        sendWeeklyEmailReport();
-      }
-    }, 24 * 60 * 60 * 1000); // Check daily if a week has passed
-
-    // Initial visitor data fetch and email setup
-    const initializeVisitorData = async () => {
-      // Increment visitor count on page load
-      setVisitorCount(prev => prev + 1);
+      const midnight = new Date(now);
+      midnight.setHours(24, 0, 0, 0); // Next midnight
+      
+      const timeUntilMidnight = midnight.getTime() - now.getTime();
+      
+      return setTimeout(() => {
+        const newCounts = calculateDailyCount();
+        setDisplayCount(newCounts.totalCount);
+        setLastUpdateDate(now.toDateString());
+        
+        // Schedule next update for the following day
+        updateAtMidnight();
+      }, timeUntilMidnight);
     };
-
-    initializeVisitorData();
+    
+    // Start the daily update cycle
+    const timeoutId = updateAtMidnight();
 
     return () => {
-      clearInterval(countInterval);
-      clearInterval(emailInterval);
+      clearTimeout(timeoutId);
     };
-  }, [lastEmailSent]);
-
+  }, [calculateDailyCount]);
 
   const cardClasses = `p-3 rounded-lg text-xs whitespace-nowrap backdrop-blur-md border transition-all duration-300 ${
-    isDarkMode
-      ? "bg-black/30 border-[#00C8C8]/30 hover:border-[#00C8C8]/60"
-      : "bg-white/70 border-[#00C8C8]/40 hover:border-[#00C8C8]/70"
-  }`;
-
-  const buttonClasses = `p-3 rounded-full backdrop-blur-md border transition-all duration-300 hover:scale-110 ${
     isDarkMode
       ? "bg-black/30 border-[#00C8C8]/30 text-[#00C8C8] hover:bg-[#00C8C8]/20"
       : "bg-white/70 border-[#00C8C8]/40 text-[#00C8C8] hover:bg-[#00C8C8]/20"
   }`;
 
-  const labelTextClasses = isDarkMode ? "text-gray-400" : "text-gray-500";
+  const labelTextClasses = isDarkMode ? 'text-gray-400' : 'text-gray-500';
   
   return (
     <div className="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-2 transition-all duration-300 ease-in-out">
@@ -137,14 +165,28 @@ const VisitorInfo: React.FC<VisitorInfoProps> = ({ isDarkMode }) => {
           {/* Visitor Count Only */}
           <div className={`${cardClasses} flex items-center gap-2`}>
             <div className="flex flex-col">
-              <div className="flex items-center gap-1">
-                <span className="font-bold text-white">{visitorCount.toLocaleString()}</span>
-                <span className="text-[10px] px-1 py-0.5 rounded-full bg-green-500/10 text-green-400">+{Math.floor(visitorCount * 0.02)} today</span>
+              <div className="flex items-center gap-2 hover:scale-105 transition-transform duration-300">
+                <div className="relative">
+                  <span className="text-sm font-mono font-bold text-blue-600 dark:text-blue-400">
+                    {displayCount.toLocaleString()}
+                  </span>
+                  <span className="absolute -right-1 -top-1 w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-green-500/10 text-green-400">
+                  +{calculateDailyCount().todaysVisitors} today
+                </span>
               </div>
-              <span className="text-[10px] text-gray-300">Total Visitors</span>
+              <span className={`text-[10px] ${labelTextClasses}`}>Total Visitors</span>
             </div>
           </div>
         </div>
+        <style>{`
+          @keyframes pulse {
+            0% { opacity: 0.7; }
+            50% { opacity: 1; }
+            100% { opacity: 0.7; }
+          }
+        `}</style>
       </div>
     </div>
   );
