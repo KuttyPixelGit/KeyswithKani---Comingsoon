@@ -228,12 +228,16 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
           <div 
             className="mt-2" 
             style={{
-              color: isDarkMode ? "#FFC000" : "#00AAAA",
+              background: 'linear-gradient(90deg, #FFC000 0%, #FFD700 50%, #00C8C8 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
               letterSpacing: '0.05em',
-              fontWeight: 'bold'
+              fontWeight: 'bold',
+              display: 'inline-block',
+              textShadow: isDarkMode ? '0 2px 4px rgba(0,0,0,0.3)' : '0 2px 4px rgba(0,0,0,0.1)'
             }}
           >
-            WITH ME
+            WITH ME - Realtor Kanimozhi
           </div>
         </div>
         
