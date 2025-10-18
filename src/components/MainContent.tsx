@@ -131,20 +131,70 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
                 backfaceVisibility: 'hidden' as const,
                 perspective: '1000px' as const
             }}></div>
-            <div className="relative w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 mx-auto">
-              <img 
-                src="/keyswithKani.gif" 
-                alt="Keyswithkani" 
-                className="w-full h-full object-contain rounded-2xl"
-                style={{
-                  filter: 'drop-shadow(0 0 10px rgba(0, 200, 200, 0.7))',
-                  animation: showContent ? 
-                    'logoFlip 6s ease-in-out infinite, logoGlowPulseGoldTeal 3s ease-in-out infinite alternate' : 'none',
-                  transformStyle: 'preserve-3d',
-                  willChange: 'transform, filter',
-                  transition: 'all 0.3s ease-out'
-                }}
-              />
+            <div className="relative w-24 h-24 md:w-36 md:h-36 lg:w-48 lg:h-48 mx-auto" style={{
+              perspective: '1000px',
+              transformStyle: 'preserve-3d'
+            }}>
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                transition: 'transform 1.5s ease-in-out',
+                transformStyle: 'preserve-3d',
+                animation: showContent ? 'logoFlip 12s ease-in-out infinite' : 'none'
+              }}>
+                {/* Front side - Century 21 Logo */}
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backfaceVisibility: 'hidden',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0.5rem',
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none'
+                }}>
+                  <img 
+                    src="/Century 21.gif" 
+                    alt="Century 21" 
+                    className="w-full h-full object-contain"
+                    style={{
+                      filter: 'drop-shadow(0 0 10px rgba(255, 200, 0, 0.7))',
+                      transform: 'rotateY(0deg)',
+                      borderRadius: '12px',
+                      animation: 'logoGlowPulseGold 3s ease-in-out infinite alternate'
+                    }}
+                  />
+                </div>
+                
+                {/* Back side - KeyswithKani Logo */}
+                <div style={{
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  backfaceVisibility: 'hidden',
+                  transform: 'rotateY(180deg)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '0.5rem',
+                  backgroundColor: 'transparent',
+                  boxShadow: 'none'
+                }}>
+                  <img 
+                    src="/keyswithKani.gif" 
+                    alt="KeyswithKani" 
+                    className="w-full h-full object-contain"
+                    style={{
+                      filter: 'drop-shadow(0 0 10px rgba(0, 200, 200, 0.7))',
+                      animation: 'logoGlowPulseGoldTeal 3s ease-in-out infinite alternate',
+                      borderRadius: '12px'
+                    }}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
