@@ -300,7 +300,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
                 <span className="text-sm md:text-base font-extrabold tracking-wide">WE'RE LAUNCHING IN PRODUCTION SOON</span>
               </h2>
               <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                January 1, 2026
+                August 1, 2026
               </p>
             </div>
             
