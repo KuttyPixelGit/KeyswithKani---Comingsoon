@@ -43,7 +43,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
 
   useEffect(() => {
     const calculateTimeLeft = () => {
-      const difference = new Date('2026-01-01T00:00:00').getTime() - new Date().getTime();
+      const difference = new Date('2026-08-01T00:00:00').getTime() - new Date().getTime();
       
       if (difference > 0) {
         setTimeLeft({
