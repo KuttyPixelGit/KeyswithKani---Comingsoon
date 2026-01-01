@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 
-export function useComingSoon() {
+interface UseComingSoonProps {
+  minLoadingTime?: number; // in milliseconds
+}
+
+export function useComingSoon({ minLoadingTime = 10000 }: UseComingSoonProps = {}) {
   const [isLoading, setIsLoading] = useState(true);
   const [showContent, setShowContent] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -37,8 +41,6 @@ export function useComingSoon() {
       
       preloadAssets();
 
-      // Set a minimum loading time to prevent flash of loading state
-      const minLoadingTime = 1000; // 1 second minimum loading time
       const startTime = Date.now();
       
       // Check if all critical assets are loaded
@@ -75,10 +77,22 @@ export function useComingSoon() {
       
       // Fallback in case the load event doesn't fire
       const fallbackTimer = setTimeout(() => {
-        console.warn('Load event timeout, proceeding anyway');
-        setIsLoading(false);
-        setShowContent(true);
-      }, 3000); // 3 second timeout
+        console.warn('Load event timeout, checking if we can proceed');
+        const elapsed = Date.now() - startTime;
+        const remainingTime = Math.max(0, minLoadingTime - elapsed);
+        
+        if (remainingTime <= 0) {
+          console.log('Minimum loading time reached, proceeding to content');
+          setIsLoading(false);
+          setShowContent(true);
+        } else {
+          console.log(`Waiting ${remainingTime}ms more before showing content`);
+          setTimeout(() => {
+            setIsLoading(false);
+            setShowContent(true);
+          }, remainingTime);
+        }
+      }, minLoadingTime);
 
       return () => {
         clearTimeout(fallbackTimer);

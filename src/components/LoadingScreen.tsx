@@ -1,8 +1,15 @@
-import React, { useEffect, useState, memo } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import '../styles/fonts.css';
 
-const LoadingScreen: React.FC = () => {
+interface LoadingScreenProps {
+  onVideoEnd: () => void;
+  onVideoReady: () => void;
+}
+
+const LoadingScreen: React.FC<LoadingScreenProps> = ({ onVideoEnd, onVideoReady }) => {
   const [mouse, setMouse] = useState({ x: 0, y: 0 });
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   useEffect(() => {
     const handleMove = (e: PointerEvent) => {
@@ -10,9 +17,96 @@ const LoadingScreen: React.FC = () => {
       const cy = window.innerHeight / 2;
       setMouse({ x: (e.clientX - cx) / cx, y: (e.clientY - cy) / cy });
     };
+
+    // Request fullscreen when component mounts
+    const requestFullscreen = async () => {
+      try {
+        if (document.documentElement.requestFullscreen) {
+          await document.documentElement.requestFullscreen();
+        }
+      } catch (err) {
+        console.warn('Failed to enter fullscreen:', err);
+      }
+    };
+
     window.addEventListener("pointermove", handleMove);
-    return () => window.removeEventListener("pointermove", handleMove);
+    requestFullscreen();
+
+    return () => {
+      window.removeEventListener("pointermove", handleMove);
+      // Exit fullscreen when component unmounts
+      if (document.fullscreenElement) {
+        document.exitFullscreen().catch(console.warn);
+      }
+    };
   }, []);
+
+  // Handle video events
+  const handlePlay = async () => {
+    console.log('Video started playing');
+    const video = videoRef.current;
+    if (!video) return;
+
+    try {
+      // Ensure video starts from the beginning
+      video.currentTime = 0;
+      
+      // Try to enter fullscreen
+      if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+        try {
+          await document.documentElement.requestFullscreen();
+        } catch (err) {
+          console.warn('Fullscreen error:', err);
+          // Continue even if fullscreen fails
+        }
+      }
+
+      // Force the video to stay in focus and prevent any interruptions
+      video.focus();
+      video.controls = false;
+      
+      // Ensure video is playing
+      if (video.paused) {
+        await video.play();
+      }
+    } catch (err) {
+      console.warn('Error in handlePlay:', err);
+      // If we can't play, show error and continue after delay
+      setVideoError('Unable to play video. Continuing to site...');
+      setTimeout(onVideoEnd, 2000);
+    }
+  };
+
+  const handleError = (e: React.SyntheticEvent<HTMLVideoElement>) => {
+    const video = e.target as HTMLVideoElement;
+    console.error('Video error:', video.error);
+    setVideoError('Failed to load video. Please refresh the page.');
+    // Continue to main content if video fails to load
+    setTimeout(onVideoEnd, 2000);
+  };
+
+  const handleLoadedData = async () => {
+    console.log('Video loaded, attempting to play...');
+    const video = videoRef.current;
+    if (!video) return;
+
+    try {
+      // Ensure video starts from the beginning
+      video.currentTime = 0;
+      
+      // Notify parent that video is ready
+      onVideoReady();
+      
+      // Play the video
+      await video.play();
+      
+      // If we get here, video is playing
+      console.log('Video is now playing');
+    } catch (err) {
+      console.error('Playback failed:', err);
+      setVideoError('Auto-play was prevented. Click to continue...');
+    }
+  };
 
   const translate = (factor: number) => `translate(${mouse.x * factor}px, ${mouse.y * factor}px)`;
 
@@ -49,7 +143,59 @@ const LoadingScreen: React.FC = () => {
         {particles}
       </div>
       
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+      {/* New Year Wishes Video - Fullscreen and centered */}
+      <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center pointer-events-none">
+        {videoError ? (
+          <div className="text-white text-center p-4">
+            <p className="text-xl mb-4">{videoError}</p>
+            <button 
+              onClick={onVideoEnd}
+              className="px-6 py-2 bg-blue-600 rounded hover:bg-blue-700 transition-colors"
+            >
+              Continue to Site
+            </button>
+          </div>
+        ) : (
+          <video 
+            ref={videoRef}
+            autoPlay
+            muted
+            playsInline
+            disablePictureInPicture
+            disableRemotePlayback
+            onPlay={handlePlay}
+            onError={handleError}
+            onEnded={onVideoEnd}
+            onLoadedData={handleLoadedData}
+            onPause={(e: React.SyntheticEvent<HTMLVideoElement>) => {
+              // Prevent pausing
+              const video = e.target as HTMLVideoElement;
+              if (!video.ended) {
+                video.play().catch(console.error);
+              }
+            }}
+            className="max-w-full max-h-full w-auto h-auto"
+            style={{
+              position: 'fixed',
+              top: '50%',
+              left: '50%',
+              transform: 'translate(-50%, -50%)',
+              width: '100vw',
+              height: '100vh',
+              objectFit: 'contain',
+              outline: 'none',
+              zIndex: 9999,
+              backgroundColor: '#000'
+            }}
+            tabIndex={-1}
+          >
+            <source src="/2026.mp4" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        )}
+      </div>
+      
+      <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ zIndex: 1 }}>
         <div className="fixed inset-0 bg-black opacity-0" style={{ animation: "vignette 0.5s ease-out forwards" }} />
         <div className="relative flex flex-col items-center justify-center">
           {/* Container for content with large glowing dot behind */}
