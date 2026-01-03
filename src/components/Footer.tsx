@@ -92,7 +92,7 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
     }
   };
 
-  const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 focus:outline-none focus:scale-105 ${isDarkMode ? "bg-black/20 border-[#00C8C8]/30 text-white placeholder-gray-400 focus:border-[#00C8C8] focus:bg-black/40" : "bg-white/60 border-[#00C8C8]/40 text-black placeholder-gray-500 focus:border-[#00C8C8] focus:bg-white/80"}`;
+  const inputClasses = `w-full px-6 py-4 rounded-2xl border-2 backdrop-blur-md transition-all duration-300 focus:outline-none focus:scale-105 ${isDarkMode ? "bg-black/20 border-[#00C8C8]/30 text-white placeholder-white/70 focus:border-[#00C8C8] focus:bg-black/40" : "bg-white/60 border-[#00C8C8]/40 text-black placeholder-gray-500 focus:border-[#00C8C8] focus:bg-white/80"}`;
   const boxShadowStyle = { boxShadow: isDarkMode ? "0 0 20px rgba(0, 200, 200, 0.1)" : "0 0 20px rgba(0, 200, 200, 0.2)" };
 
   // Determine if the form is in a loading state
@@ -181,14 +181,17 @@ const ContactForm = ({ isDarkMode }: { isDarkMode: boolean }) => {
                 className="text-base md:text-lg" 
                 style={{
                   fontFamily: '"Poppins", sans-serif',
-                  fontWeight: 400,
+                  fontWeight: 500,
                   letterSpacing: '0.01em',
                   marginTop: '0.75rem',
                   maxWidth: '28rem',
                   marginLeft: 'auto',
                   marginRight: 'auto',
                   lineHeight: '1.6',
-                  color: isDarkMode ? 'rgba(255, 255, 255, 0.8)' : 'rgba(0, 0, 0, 0.8)'
+                  background: 'linear-gradient(90deg, #2A2A2A 0%, #FFD700 50%, #00C8C8 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
                 }}
               >
                 Ready to create something amazing together?
@@ -436,7 +439,7 @@ const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode })
             <div className="relative">
               {/* Kani Image - normal display without blending for better visibility */}
               <img 
-                src="/Kani.png" 
+                src="/Kani 2.png" 
                 alt="Kani" 
                 className="w-full max-w-md mx-auto"
               />
@@ -458,7 +461,7 @@ const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode })
             <style dangerouslySetInnerHTML={{
               __html: `@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap');`
             }} />
-            <p className={`text-lg md:text-xl mb-8 leading-relaxed ${isDarkMode ? "text-gray-200" : "text-gray-700"}`}>
+            <p className="text-lg md:text-xl mb-8 leading-relaxed text-[#2A2A2A]">
              ✨ I'm Kanimozhi Sundaram, a Realtor in Ontario who turns real estate into more than just a transaction - it's about dreams, trust, and new beginnings. My goal is simple: to make your buying or selling journey smooth, successful, and unforgettable. Let's find the place where your story truly begins. ✨
             </p>
           </div>
@@ -471,7 +474,7 @@ const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode })
 // --- Copyright Footer ---
 const CopyrightFooter = ({ isDarkMode }: { isDarkMode: boolean }) => (
   <footer className="py-12 text-center">
-    <p className={`text-sm font-medium ${isDarkMode ? "text-gray-400" : "text-gray-600"}`} style={{ textShadow: isDarkMode ? "0 1px 2px rgba(0,0,0,0.5)" : "0 1px 2px rgba(255,255,255,0.8)" }}>
+    <p className="text-sm font-medium text-[#5A5A5A]" style={{ textShadow: "0 1px 2px rgba(0,0,0,0.1)" }}>
       © 2025 Keyswithkani. All rights reserved.
     </p>
   </footer>

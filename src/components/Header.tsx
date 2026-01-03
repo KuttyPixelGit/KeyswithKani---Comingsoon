@@ -50,7 +50,7 @@ const Header: React.FC<HeaderProps> = ({ isDarkMode }) => {
             
             {/* Circular Kani Image - increased size */}
             <img 
-              src="/Kani.png" 
+              src="/Kani 2.png" 
               alt="Kani" 
               className="w-24 h-24 rounded-full object-cover border-2 border-[#FFD700] relative z-10"
             />

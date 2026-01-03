@@ -257,7 +257,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         {/* Subheading */}
         <div 
           className={`text-xl md:text-2xl lg:text-3xl max-w-5xl mx-auto leading-relaxed mt-8 ${
-            isDarkMode ? "text-gray-200" : "text-gray-800"
+            isDarkMode ? "text-[#2A2A2A]" : "text-[#2A2A2A]"
           } ${showBlinkingDot ? 'animate-float' : ''}`}
           style={{ 
             fontFamily: '"Playfair Display", serif',
@@ -268,11 +268,11 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         >
           <p>
             <span>Step into your next chapter with </span>
-            <span style={{ color: isDarkMode ? "#FFC000" : "#00AAAA" }}>confidence</span>
+            <span style={{ color: "#B8860B" }}>confidence</span>
             <span>, </span>
-            <span style={{ color: isDarkMode ? "#00C8C8" : "#00AAAA" }}>clarity</span>
+            <span style={{ color: "#008B8B" }}>clarity</span>
             <span>, and </span>
-            <span style={{ color: isDarkMode ? "#FFC000" : "#00AAAA" }}>care</span>
+            <span style={{ color: "#B8860B" }}>care</span>
             <span>.</span>
           </p>
           <div 
@@ -295,31 +295,26 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         <div className="relative mt-10 mb-12 w-full max-w-md mx-auto px-4">
           <div className="relative z-10 text-center">
             <div className="mb-10">
-              <h2 className="text-lg md:text-xl font-medium mb-3 bg-gradient-to-r from-yellow-300 to-teal-400 bg-clip-text text-transparent leading-tight">
+              <h2 className="text-lg md:text-xl font-medium mb-3 text-[#2A2A2A] leading-tight">
               We are active now to guide your next home<br />
                 <span className="text-sm md:text-base font-extrabold tracking-wide">WE'RE LAUNCHING IN PRODUCTION SOON</span>
               </h2>
-              <p className={`text-xs ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+              <p className="text-xs text-[#5A5A5A]">
                 August 1, 2026
               </p>
             </div>
             
             {/* Compact countdown box */}
-            <div className={`relative rounded-xl overflow-hidden transition-all duration-300 mx-auto
-              ${isDarkMode ? 'bg-gray-800/90' : 'bg-white/95'}
-              border ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}
-              shadow-lg hover:shadow-xl animate-glow p-3 max-w-xs`}
+            <div className="relative rounded-xl overflow-hidden transition-all duration-300 mx-auto
+              bg-[#F2F2F0] border-2 border-black p-3 max-w-xs"
               style={{
-                animation: 'countdownGlow 3s ease-in-out infinite',
                 position: 'relative',
-                zIndex: 1
+                zIndex: 1,
+                boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
               }}>
               
-              {/* Dual-tone inner glow */}
-              <div className="absolute inset-0 overflow-hidden rounded-xl">
-                <div className="absolute top-0 left-0 right-0 h-1/2 bg-gradient-to-b from-yellow-400/15 to-transparent"></div>
-                <div className="absolute bottom-0 left-0 right-0 h-1/2 bg-gradient-to-t from-teal-400/15 to-transparent"></div>
-              </div>
+              {/* Subtle inner border */}
+              <div className="absolute inset-0 border border-gray-200 rounded-xl pointer-events-none"></div>
               
               {/* Countdown grid */}
               <div className="relative z-10">
@@ -331,18 +326,18 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
                     { value: timeLeft.seconds, label: 'Secs' },
                   ].map((item, index) => (
                     <div key={index} className="text-center">
-                      <div className="text-xl font-bold bg-gradient-to-r from-yellow-400 to-teal-400 bg-clip-text text-transparent">
+                      <div className="text-2xl font-bold bg-gradient-to-r from-[#FFD700] to-[#00C8C8] bg-clip-text text-transparent">
                         {String(item.value).padStart(2, '0')}
                       </div>
-                      <div className={`text-[9px] uppercase tracking-wider ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      <div className="text-[9px] uppercase tracking-wider text-gray-600">
                         {item.label}
                       </div>
                     </div>
                   ))}
                 </div>
                 
-                {/* Bottom gradient accent */}
-                <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-gradient-to-r from-yellow-400/70 via-teal-400 to-yellow-400/70 rounded-full mt-3"></div>
+                {/* Bottom border accent */}
+                <div className="absolute bottom-0 left-2 right-2 h-[1px] bg-gray-200 rounded-full mt-3"></div>
               </div>
             </div>
           </div>
@@ -352,7 +347,7 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
         <div className="mt-10">
           <p 
             className={`text-lg md:text-xl lg:text-xl font-normal ${
-              isDarkMode ? "text-gray-200" : "text-gray-800"
+              isDarkMode ? "text-[#2A2A2A]" : "text-[#2A2A2A]"
             }`} 
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
@@ -361,8 +356,8 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
               href="mailto:contact@keyswithkani.ca" 
               className={`font-bold ${
                 isDarkMode 
-                  ? "text-[#FFC000] hover:text-[#00C8C8]" 
-                  : "text-[#00AAAA] hover:text-[#00C8C8]"
+                  ? "text-[#B8860B] hover:text-[#008B8B]" 
+                  : "text-[#B8860B] hover:text-[#008B8B]"
               }`}
             >
               contact@keyswithkani.ca

@@ -22,7 +22,7 @@ export function useComingSoon({ minLoadingTime = 10000 }: UseComingSoonProps = {
         try {
           const assets = [
             '/keyswithKani.gif',
-            '/Kani.png',
+            '/Kani B&W.png',
             '/Icon.png'
           ];
           
