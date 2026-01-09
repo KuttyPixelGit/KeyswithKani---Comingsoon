@@ -431,18 +431,47 @@ const ContactInfo = ({ isDarkMode }: { isDarkMode: boolean }) => (
 // --- Kani Spotlight Section ---
 const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode }) => {
   return (
-    <section id="meet-kani-section" className="py-20 px-6">
+    <section id="meet-kani-section" className="py-20 px-6 relative">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Kani Image with full opacity and no blending */}
+          {/* Kani Image with backlight */}
           <div className="relative flex justify-center">
-            <div className="relative">
-              {/* Kani Image - normal display without blending for better visibility */}
-              <img 
-                src="/Kani 2.png" 
-                alt="Kani" 
-                className="w-full max-w-md mx-auto"
-              />
+            <div className="relative group">
+              {/* Backlight glow - always visible */}
+              <div className="absolute -inset-4 bg-gradient-to-br from-[#FFD700]/30 to-[#00C8C8]/30 rounded-2xl blur-xl opacity-70 -z-10"></div>
+              
+              {/* Main container with subtle border and shadow */}
+              <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-[#FFD700]/10 to-[#00C8C8]/5 p-0.5">
+                <div className="relative rounded-2xl overflow-hidden bg-black/20 backdrop-blur-sm">
+                  {/* Backlight gradient that's always visible */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/10 to-[#00C8C8]/5 rounded-2xl -z-10"></div>
+                  
+                  {/* The Kani image */}
+                  <img 
+                    src="/Kani 2.png" 
+                    alt="Kani" 
+                    className="w-full max-w-md mx-auto transform transition-all duration-500 group-hover:scale-105 rounded-2xl"
+                    style={{
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)'
+                    }}
+                  />
+                </div>
+              </div>
+              
+              {/* Subtle floating animation */}
+              <style>
+                {`
+                @keyframes float {
+                  0% { transform: translateY(0px); }
+                  50% { transform: translateY(-10px); }
+                  100% { transform: translateY(0px); }
+                }
+                .group:hover img {
+                  animation: float 4s ease-in-out infinite;
+                }
+                `}
+              </style>
             </div>
           </div>
           
