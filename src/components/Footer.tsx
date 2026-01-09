@@ -446,16 +446,42 @@ const KaniSpotlightSection: React.FC<{ isDarkMode: boolean }> = ({ isDarkMode })
                   {/* Backlight gradient that's always visible */}
                   <div className="absolute inset-0 bg-gradient-to-br from-[#FFD700]/10 to-[#00C8C8]/5 rounded-2xl -z-10"></div>
                   
-                  {/* The Kani image */}
-                  <img 
-                    src="/Kani 2.png" 
-                    alt="Kani" 
-                    className="w-full max-w-md mx-auto transform transition-all duration-500 group-hover:scale-105 rounded-2xl"
+                  {/* The Kani image with protection */}
+                  <div 
+                    className="relative w-full max-w-md mx-auto"
                     style={{
-                      border: '1px solid rgba(255, 255, 255, 0.1)',
-                      boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)'
+                      userSelect: 'none',
+                      WebkitUserSelect: 'none',
+                      MozUserSelect: 'none',
+                      msUserSelect: 'none',
+                      pointerEvents: 'none'
                     }}
-                  />
+                    onContextMenu={(e) => e.preventDefault()}
+                    onDragStart={(e) => e.preventDefault()}
+                  >
+                    <img 
+                      src="/Kani 2.png" 
+                      alt="Kani" 
+                      className="w-full h-auto transform transition-all duration-500 group-hover:scale-105 rounded-2xl"
+                      style={{
+                        border: '1px solid rgba(255, 255, 255, 0.1)',
+                        boxShadow: '0 4px 30px rgba(0, 0, 0, 0.1)',
+                        pointerEvents: 'none'
+                      }}
+                      draggable="false"
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                    {/* Transparent overlay to prevent right-click save */}
+                    <div 
+                      className="absolute inset-0"
+                      style={{
+                        background: 'transparent',
+                        pointerEvents: 'auto',
+                        cursor: 'default'
+                      }}
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                  </div>
                 </div>
               </div>
               
