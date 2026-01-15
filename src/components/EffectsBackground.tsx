@@ -35,55 +35,72 @@ if (typeof document !== 'undefined') {
 }
 
 // Sparkles Component
-const Sparkles = memo(({ count = 20 }: { count: number }) => {
+const Sparkles = memo(({ count = 30 }: { count: number }) => {
   const sparkles = useMemo(() => Array.from({ length: count }), [count]);
   
   return (
-    <div className="fixed inset-0 pointer-events-none">
-      {sparkles.map((_, i) => (
-        <div
-          key={`sparkle-${i}`}
-          className="absolute rounded-full"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            width: `${Math.random() * 3 + 1}px`,
-            height: `${Math.random() * 3 + 1}px`,
-            backgroundColor: ['#FFD700', '#00C8C8'][Math.floor(Math.random() * 2)],
-            opacity: 0,
-            animation: `sparkle ${2 + Math.random() * 3}s ease-in-out ${Math.random() * 2}s infinite`,
-            boxShadow: `0 0 ${Math.random() * 6 + 4}px ${['#FFD700', '#00C8C8'][Math.floor(Math.random() * 2)]}`
-          }}
-        />
-      ))}
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {sparkles.map((_, i) => {
+        const size = Math.random() * 4 + 2;
+        const delay = Math.random() * 5;
+        const duration = Math.random() * 2 + 1.5;
+        const opacity = Math.random() * 0.5 + 0.1;
+        
+        return (
+          <div
+            key={`sparkle-${i}`}
+            className="absolute rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${size}px`,
+              height: `${size}px`,
+              backgroundColor: '#00C8C8',
+              opacity: 0,
+              filter: 'blur(0.5px)',
+              boxShadow: `0 0 ${size * 2}px ${size * 0.5}px rgba(0, 200, 200, ${opacity})`,
+              animation: `sparkle ${duration}s ease-in-out infinite`,
+              animationDelay: `${delay}s`,
+            }}
+          />
+        );
+      })}
     </div>
   );
 });
 
 // Snowflakes Component
-const Snowflakes = memo(({ count = 30 }: { count: number }) => {
+const Snowflakes = memo(({ count = 50 }: { count: number }) => {
   const snowflakes = useMemo(() => Array.from({ length: count }), [count]);
   
   return (
-    <div className="fixed inset-0 pointer-events-none">
-      {snowflakes.map((_, i) => (
-        <div
-          key={`snowflake-${i}`}
-          className="absolute"
-          style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
-            width: `${Math.random() * 3 + 1}px`,
-            height: `${Math.random() * 3 + 1}px`,
-            backgroundColor: ['#FFFFFF', '#F0F0F0', '#E6E6E6'][Math.floor(Math.random() * 3)],
-            opacity: Math.random() * 0.6 + 0.2,
-            borderRadius: '50%',
-            animation: `snowfall ${10 + Math.random() * 20}s linear infinite`,
-            animationDelay: `${Math.random() * 5}s`,
-            filter: 'blur(0.5px)'
-          }}
-        />
-      ))}
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {snowflakes.map((_, i) => {
+        const size = Math.random() * 3 + 1;
+        const opacity = Math.random() * 0.3 + 0.1;
+        const duration = Math.random() * 15 + 15;
+        const delay = Math.random() * 5;
+        
+        return (
+          <div
+            key={`snowflake-${i}`}
+            className="absolute rounded-full"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `-20px`,
+              width: `${size}px`,
+              height: `${size}px`,
+              backgroundColor: '#00C8C8',
+              opacity: opacity,
+              filter: 'blur(0.5px)',
+              boxShadow: `0 0 ${size * 2}px ${size * 0.5}px rgba(0, 200, 200, ${opacity})`,
+              animation: `snowfall ${duration}s linear infinite`,
+              animationDelay: `${delay}s`,
+              transform: `translateX(${(Math.random() - 0.5) * 20}px)`,
+            }}
+          />
+        );
+      })}
     </div>
   );
 });
@@ -151,17 +168,18 @@ const EffectsBackground = ({ isDarkMode }: EffectsBackgroundProps) => {
       <div className="fixed inset-0 bg-gradient-to-br from-[#F2F2F0] via-[#E8E8E5] to-[#E0E0DD]" />
       
       {/* Animated gradient blobs */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute -top-36 -left-36 w-80 h-80 rounded-full blur-2xl opacity-15" 
-          style={{ 
-            background: 'radial-gradient(circle, rgba(255,215,0,0.1) 0%, rgba(255,215,0,0) 70%)',
-            transform: translate(6) 
-          }} />
-        <div className="absolute -bottom-40 -right-32 w-64 h-64 rounded-full blur-2xl opacity-10" 
-          style={{ 
-            background: 'radial-gradient(circle, rgba(0,200,200,0.1) 0%, rgba(0,200,200,0) 70%)',
-            transform: translate(-5) 
-          }} />
+      <div className="fixed inset-0 pointer-events-none z-[-1] opacity-40">
+        <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 via-transparent to-teal-500/20" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-teal-500/10 via-transparent to-transparent" />
+        <Sparkles count={isDarkMode ? 40 : 20} />
+        <Snowflakes count={isDarkMode ? 50 : 25} />
+        
+        {/* Additional teal glow effects */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-teal-500/5 blur-[100px]" />
+          <div className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-teal-500/5 blur-[100px]" />
+          <div className="absolute top-1/4 right-1/4 w-1/3 h-1/3 rounded-full bg-teal-500/5 blur-[80px]" />
+        </div>
       </div>
       
       {/* Winter Effects */}

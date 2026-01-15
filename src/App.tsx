@@ -1,12 +1,13 @@
-import React, { memo, useMemo, useState, useEffect } from 'react';
+import React, { memo, useMemo } from 'react';
 import Header from './components/Header';
 import MainContent from './components/MainContent';
 import Footer from './components/Footer';
 import EffectsBackground from './components/EffectsBackground';
+import LoadingScreen from './components/LoadingScreen';
 import GlobalStyles from './components/GlobalStyles';
+import { useComingSoon } from './hooks/useComingSoon';
 import VisitorInfo from './components/VisitorInfo';
 import { Analytics } from '@vercel/analytics/react';
-import VideoPlayer from './components/VideoPlayer';
 
 // Memoize components for better performance
 const MemoizedHeader = memo(Header);
@@ -15,15 +16,16 @@ const MemoizedFooter = memo(Footer);
 const MemoizedEffectsBackground = memo(EffectsBackground);
 const MemoizedGlobalStyles = memo(GlobalStyles);
 const MemoizedVisitorInfo = memo(VisitorInfo);
+const MemoizedLoadingScreen = memo(LoadingScreen);
 
 const App: React.FC = () => {
-  const [showContent, setShowContent] = useState(false);
-  const isDarkMode = true; // Always use dark mode
+  const {
+    isLoading,
+    showContent,
+  } = useComingSoon();
 
-  const handleVideoEnd = () => {
-    console.log('Video ended, showing main content');
-    setShowContent(true);
-  };
+  // Always use dark mode
+  const isDarkMode = true;
 
   // Memoize the main content to prevent unnecessary re-renders
   const mainContent = useMemo(() => (
@@ -43,13 +45,11 @@ const App: React.FC = () => {
       <Analytics />
       <MemoizedEffectsBackground isDarkMode={isDarkMode} />
       
-      {!showContent ? (
-        <VideoPlayer onVideoEnd={handleVideoEnd} />
-      ) : (
-        <div className="opacity-100">
-          {mainContent}
-        </div>
-      )}
+      {isLoading && <MemoizedLoadingScreen />}
+
+      <div className={`transition-opacity duration-300 ${showContent ? 'opacity-100' : 'opacity-0'}`}>
+        {mainContent}
+      </div>
     </>
   );
 };
