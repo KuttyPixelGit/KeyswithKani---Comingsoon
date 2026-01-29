@@ -26,23 +26,37 @@ const GlobalStyles: React.FC<{ isDarkMode: boolean }> = () => {
         touch-action: manipulation;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
+        scroll-behavior: smooth;
       }
 
       body {
         min-height: 100vh;
         min-height: -webkit-fill-available;
         min-height: 100dvh;
-        overscroll-behavior-y: none;
-        -webkit-overflow-scrolling: touch;
         text-rendering: optimizeLegibility;
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        scroll-behavior: smooth;
         position: relative;
         overflow-x: hidden;
+        overflow-y: scroll;
+        -webkit-overflow-scrolling: touch;
         padding: 0;
         margin: 0;
         width: 100%;
+        -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+        overscroll-behavior-y: auto;
+        scroll-snap-type: y proximity;
+      }
+      
+      /* Optimize for smooth scrolling on iOS */
+      @supports (-webkit-touch-callout: none) {
+        body {
+          position: fixed;
+          width: 100%;
+          height: 100%;
+          overflow-y: scroll;
+          -webkit-overflow-scrolling: touch;
+        }
       }
 
       /* Responsive typography */
@@ -87,6 +101,18 @@ const GlobalStyles: React.FC<{ isDarkMode: boolean }> = () => {
         transform: translateZ(0);
         backface-visibility: hidden;
         perspective: 1000px;
+        /* Improve animation performance */
+        transform-style: preserve-3d;
+        -webkit-transform-style: preserve-3d;
+        -webkit-backface-visibility: hidden;
+      }
+      
+      /* Optimize fixed/absolute positioned elements */
+      .fixed, .absolute {
+        -webkit-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
       }
       
       /* Blinking cursor animation */

@@ -63,14 +63,18 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
 
   // Handle touch events for mobile devices
   const handleTouchMove = (e: React.TouchEvent<HTMLElement>) => {
-    if (!e.touches[0]) return;
-    const touch = e.touches[0];
-    const rect = e.currentTarget.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (touch.clientX - cx) / rect.width;
-    const dy = (touch.clientY - cy) / rect.height;
-    setTilt({ x: dx * 5, y: dy * 5 }); // Reduced tilt effect for touch devices
+    // Only apply tilt effect if it's a single touch
+    if (e.touches.length === 1) {
+      const touch = e.touches[0];
+      const rect = e.currentTarget.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (touch.clientX - cx) / rect.width;
+      const dy = (touch.clientY - cy) / rect.height;
+      setTilt({ x: dx * 5, y: dy * 5 });
+    }
+    // Allow default touch behavior (scrolling)
+    return true;
   };
 
   const handleTouchEnd = () => {
@@ -91,7 +95,12 @@ const MainContent: React.FC<HeroSectionProps> = ({ isDarkMode, showContent }) =>
       paddingLeft: 'max(1rem, env(safe-area-inset-left, 1rem))' as any,
       paddingRight: 'max(1rem, env(safe-area-inset-right, 1rem))' as any,
       position: 'relative' as const,
-      overflow: 'hidden' as const,
+      overflow: 'visible' as const,
+      WebkitOverflowScrolling: 'touch' as const,
+      WebkitTouchCallout: 'none' as const,
+      WebkitUserSelect: 'none' as const,
+      userSelect: 'none' as const,
+      touchAction: 'pan-y' as const,
     },
     heading: {
       fontFamily: '"Playlist Script", cursive',
